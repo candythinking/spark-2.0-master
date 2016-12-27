@@ -35,9 +35,9 @@ Spark 在 Scala 中实现，它是 Java VM 的静态类型的高级编程语言�
 
 * 通过更改现有 RDD 的持久性。默认情况下，RDD 是懒惰和短暂的。也就是说，当数据集的分区在并行操作中使用（例如，通过 map 函数传递文件的块）时，数据集的分区可以根据需要实现，并在使用后从内存中分离。 但是，用户可以通过两个操作更改 RDD 的持久性：
 
-                               - 缓存操作使数据集延迟，但暗示它应该在第一次计算之后保存在内存中，因为它将被重用。
+  * 缓存操作使数据集延迟，但暗示它应该在第一次计算之后保存在内存中，因为它将被重用。
 
-                               - 保存操作将评估数据集并将其写入分布式文件系统（如 HDFS）。保存的版本用于将来的操作。
+  * 保存操作将评估数据集并将其写入分布式文件系统（如 HDFS）。保存的版本用于将来的操作。
 
 我们注意到，我们的缓存操作只是一个提示：如果集群中没有足够的内存来缓存数据集的所有分区，Spark将在使用时重新计算它们。我们选择了这种设计，使得Spark程序在节点故障或数据集太大时仍能继续工作（性能降低）。这个想法是松散地类似于虚拟内存。
 
@@ -57,8 +57,8 @@ Spark 在 Scala 中实现，它是 Java VM 的静态类型的高级编程语言�
 
 程序员通过将闭包（函数）传递给 Spark 来调用 map，filter 和 reduce 等操作。正如在函数式编程中，这些闭包可以引用创建它们的作用域中的变量。通常，当 Spark 在工作节点上运行闭包时，这些变量将复制到工作线程。但是，Spark 还允许程序员创建两种限制类型的共享变量，以支持两种简单但常见的使用模式：
 
-*  **Broadcast variables**：如果在多个并行操作中使用大的只读数据（例如，查找表），则优选地将它仅分发给 worker 一次，而不是将其与每个闭包一起包装。 Spark 让程序员创建一个包含该值的“广播变量”对象，并确保它只被复制到每个 worker 一次。
-*  **Accumulators**：这些 worker 只能“添加”到使用关联操作的变量，并且只有驱动程序可以读取。它们可以用于实现 MapReduce 中的计数器，并为并行和提供更强制的语法。可以为具有 “add” 运算和 “zero” 值的任何类型定义累加器。由于它们的“仅添加”语义，它们更易于容错。
+* **Broadcast variables**：如果在多个并行操作中使用大的只读数据（例如，查找表），则优选地将它仅分发给 worker 一次，而不是将其与每个闭包一起包装。 Spark 让程序员创建一个包含该值的“广播变量”对象，并确保它只被复制到每个 worker 一次。
+* **Accumulators**：这些 worker 只能“添加”到使用关联操作的变量，并且只有驱动程序可以读取。它们可以用于实现 MapReduce 中的计数器，并为并行和提供更强制的语法。可以为具有 “add” 运算和 “zero” 值的任何类型定义累加器。由于它们的“仅添加”语义，它们更易于容错。
 
 # 3. Examples
 
@@ -68,21 +68,25 @@ Spark 在 Scala 中实现，它是 Java VM 的静态类型的高级编程语言�
 
 假设我们希望计算存储在 HDFS 中的大型日志文件中包含错误的行。这可以通过从文件数据集对象开始实现，如下所示：
 
-        val file = spark.textFile\("hdfs://..."\)
+```scala
+    val file = spark.textFile("hdfs://...")
 
-        val errs = file.filter\(\_.contains\("ERROR"\)\)
+    val errs = file.filter(_.contains("ERROR"))
 
-        val ones = errs.map\(\_ =&gt; 1\)
+    val ones = errs.map(_ => 1)
 
-        val count = ones.reduce\(\_+\_\)
+    val count = ones.reduce(_+_)
+```
 
-我们首先创建一个名为 file 的分布式数据集，表示 HDFSfile asacollectionoflines。我们转换此数据集以创建包含 “ER-ROR”（errs）的行集，然后将每行映射到1，并使用 reduce 将这些行相加。 filter，map 和 reduce 的参数是函数文字的 Scala 语法。
+我们首先创建一个名为 file 的分布式数据集，表示 HDFS file as a collection of lines。我们转换此数据集以创建包含 “ERROR”（errs）的行集，然后将每行映射到1，并使用 reduce 将这些行相加。 filter，map 和 reduce 的参数是函数文字的 Scala 语法。
 
 请注意，err 和 ones 是从未实现的延迟 RDD。相反，当调用 reduce 时，每个 worker 节点以流的方式扫描输入块以评估它们，添加这些以执行本地缩减，并将其本地计数发送到驱动器。当以这种方式与懒数据集一起使用时，Spark 会密切地模拟 MapReduce。
 
 Spark 与其他框架不同的地方在于，它可以使一些中间数据集在操作中保持不变。例如，如果想重用 errs 数据集，我们可以从它创建一个缓存的 RDD 如下：
 
-        val cachedErrs = errs.cache\(\)
+```scala
+    val cachedErrs = errs.cache()
+```
 
 我们现在将能够像往常一样对 cachedErrs 或从它派生的数据集调用并行操作，但是节点会在第一次计算它们后缓存 cachedErrs 的分区到内存中，从而大大加快了对它的后续操作。
 
@@ -90,33 +94,32 @@ Spark 与其他框架不同的地方在于，它可以使一些中间数据集�
 
 以下程序实现逻辑回归，一种迭代分类算法，试图找到最佳分离两组点的超平面 w。该算法执行梯度下降：它以随机值开始 w，并且在每次迭代中，它对数据的 w 的函数求和以在改进它的方向上移动 w。因此，它通过跨越迭代在内存中缓存数据极大地受益。我们不详细解释逻辑回归，但我们使用它来展示一些新的 Spark 特性。
 
-        // Read points from a text file and cache them
+```scala
+    // Read points from a text file and cache them
 
-        val points = spark.textFile\(...\)
+    val points = spark.textFile(...)
 
-        .map\(parsePoint\).cache\(\)
+    .map(parsePoint).cache()
 
-        // Initialize w to random D-dimensional vector
+    // Initialize w to random D-dimensional vector
 
-        var w = Vector.random\(D\)
+    var w = Vector.random(D)
 
-        // Run multiple iterations to update w
+    // Run multiple iterations to update w
 
-        for \(i &lt;- 1 to ITERATIONS\) {
+    for (i <- 1 to ITERATIONS) {
 
-            val grad = spark.accumulator\(new Vector\(D\)\)
+        val grad = spark.accumulator(new Vector(D))
 
-            for \(p &lt;- points\) { // Runs in parallel
+        for (p <- points) { // Runs in parallel
 
-                val s = \(1/\(1+exp\(-p.y \* \(w dot p.x\)\)\)-1\) \* p.y
+            val s = (1/(1+exp(-p.y * (w dot p.x)))-1) * p.y
 
-                grad += s \* p.x
-
-            }
-
-            w -= grad.value
-
+            grad += s * p.x
         }
+        w -= grad.value
+    }
+```
 
 首先，虽然我们创建一个 RDD 称为点，我们通过运行一个 for 循环来处理它。 Scala 中的关键字是用于调用集合的 foreach 方法的语法糖，其中循环体作为闭包。也就是说，（p &lt; - points）{body} 的代码等同于 points.foreach（p =&gt;{body}）。因此，我们调用 Spark 的并行 foreach 操作。
 
@@ -130,41 +133,33 @@ Spark 与其他框架不同的地方在于，它可以使一些中间数据集�
 
 1.将 M 初始化为随机值。
 
-2.优化 U 给定 M 以最小化 R 上的误差。 
+2.优化 U 给定 M 以最小化 R 上的误差。
 
 3.优化 M 给定 U 以最小化 R 上的误差。
 
 4.重复步骤2和3直到收敛。
 
-可以通过在步骤2和3中更新每个节点上的不同用户/电影来并行化 ALS。然而，由于所有步骤都使用 R，因此使 R 成为广播变量并且不会在每个步骤重新发送到每个节点是有帮助的。 ALS 的 Spark 实现如下所示。 Notethatweparallelizethecollection 0 直到 u（Scala范围对象），并收集它来更新每个数组：
+可以通过在步骤2和3中更新每个节点上的不同用户/电影来并行化 ALS。然而，由于所有步骤都使用 R，因此使 R 成为广播变量并且不会在每个步骤重新发送到每个节点是有帮助的。 ALS 的 Spark 实现如下所示。 注意我们并行化集合 0 直到 u（Scala范围对象），并收集它来更新每个数组：
 
-        val Rb = spark.broadcast\(R\)
+```scala
+    val Rb = spark.broadcast(R)
 
-        for \(i &lt;- 1 to ITERATIONS\) {
+    for (i <- 1 to ITERATIONS) {
 
-            U = spark.parallelize\(0 until u\)
+        U = spark.parallelize(0 until u)
 
-            .map\(j =&gt; updateUser\(j, Rb, M\)\)
+        .map(j => updateUser(j, Rb, M))
 
-            .collect\(\)
+        .collect()
 
-            M = spark.parallelize\(0 until m\)
+        M = spark.parallelize(0 until m)
 
-            .map\(j =&gt; updateUser\(j, Rb, U\)\)
+        .map(j => updateUser(j, Rb, U))
 
-            .collect\(\)
+        .collect()
 
-        }
-
-
-
-
-
-
-
-
-
-
+    }
+```
 
 
 
