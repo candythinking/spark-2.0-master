@@ -36,9 +36,9 @@
 
 为了在大规模运行这些应用程序，我们寻求一个系统设计，以满足四个目标：
 
-1.可扩展到数百个节点。 
+1.可扩展到数百个节点。
 
-2.除了基本处理之外的最小成本 - 例如，我们不希望支付2×复制开销。 
+2.除了基本处理之外的最小成本 - 例如，我们不希望支付2×复制开销。
 
 3.二级延迟。
 
@@ -76,11 +76,13 @@ D-Streams 通过将计算结构化为一组短的，无状态的，确定性的�
 
 我们用一个 Spark Streaming 程序说明这个想法，该程序通过 URL 计算视图事件的运行计数。 Spark Streaming 通过类似于 Scala 编程语言中的 LINQ \[42,2\] 的功能 API 来展示 D-Streams。 我们的程序的代码是：
 
-    pageViews = readStream（“http：// ...”，“1s”）
+```
+pageViews = readStream（“http：// ...”，“1s”）
 
-    ones = pageViews.map（event =&gt;（event.url，1））
+ones = pageViews.map（event =&gt;（event.url，1））
 
-    counts = ones.runningReduce（（a，b） b）
+counts = ones.runningReduce（（a，b） b）
+```
 
 此代码通过 HTTP 读取事件流创建一个称为 pageViews 的 D 流，并将这些流分组为1秒间隔。然后，它转换事件流以获得称为“1”的（D，D）流的（D，D）流，并且通过有状态的运行 Reduce 变换来执行这些流的运行计数。map 和运行 Reduce 的参数是 Scala 函数文字。
 
@@ -115,14 +117,16 @@ D-Streams 通过将计算结构化为一组短的，无状态的，确定性的�
 
 在 Spark Streaming 中，用户使用功能API注册一个或多个流。程序可以从外部定义输入流，其通过使节点在端口上监听或通过从存储系统（例如，HDFS）周期性地加载它来接收数据。然后它可以对这些流应用两种类型的操作：
 
-*  **Transformations**：其从一个或多个父流创建新的 D 流。这些可以是无状态的，在每个时间间隔中分别在 RDD 上应用，或者它们可以跨间隔产生状态。
-*  **Output operations**：它让程序将数据写入外部系统。例如，保存操作将 D-Stream 中的每个 RDD 输出到数据库。
+* **Transformations**：其从一个或多个父流创建新的 D 流。这些可以是无状态的，在每个时间间隔中分别在 RDD 上应用，或者它们可以跨间隔产生状态。
+* **Output operations**：它让程序将数据写入外部系统。例如，保存操作将 D-Stream 中的每个 RDD 输出到数据库。
 
 D-Streams 支持典型的批处理框架\[12，42\]中可用的相同的无状态转换，包括 map，reduce，groupBy 和 join。我们提供 Spark 的所有操作\[43\]。例如，程序可以使用以下代码在字串的每个时间间隔上运行规范的 MapReduce 字计数：
 
-    pairs = words.map（w =&gt;（w，1））
+```
+pairs = words.map（w =&gt;（w，1））
 
-    counts = pairs.reduceByKey（（a，b）=&gt; a + b）
+counts = pairs.reduceByKey（（a，b）=&gt; a + b）
+```
 
 此外，D-Streams 基于诸如滑动窗口的标准流处理技术为跨越多个间隔的计算提供了若干状态转换\[10,4\]。这些包括：
 
@@ -130,7 +134,9 @@ D-Streams 支持典型的批处理框架\[12，42\]中可用的相同的无状�
 
 **Incremental aggregation：**对于在滑动窗口上计算聚合（如计数或最大值）的常见用例，D-Streams 具有增量 reduceByWindow 操作的几个变体。最简单的只需要一个关联合并函数来组合值。例如，在上面的代码中，可以写：
 
-    pairs.reduceByWindow（“5s”，（a，b）=&gt; a + b）
+```
+pairs.reduceByWindow（“5s”，（a，b）=&gt; a + b）
+```
 
 这将计算每个时间间隔的每间隔计数一次，但必须重复添加过去五秒的计数，如图4（a）所示。如果聚合函数也是可逆的，一个更高效的版本还采用“减”值的函数，并且以增量方式维持状态（图4（b））：
 
@@ -146,17 +152,19 @@ D-Streams 支持典型的批处理框架\[12，42\]中可用的相同的无状�
 
 例如，可以对来自（ClientID，Event）对的流的活动会话进行计数，如下所示：
 
-    sessions = events.track\( 
+```
+sessions = events.track\( 
 
-        \(key, ev\) =&gt; 1, // initialize function 
+    \(key, ev\) =&gt; 1, // initialize function 
 
-        \(key, st, ev\) =&gt; // update function 
+    \(key, st, ev\) =&gt; // update function 
 
-        ev == Exit ? null : 1,
+    ev == Exit ? null : 1,
 
-        "30s"\) // timeout
+    "30s"\) // timeout
 
-    counts = sessions.count\(\) // a stream of ints
+counts = sessions.count\(\) // a stream of ints
+```
 
 此代码将每个客户端的状态设置为1（如果它处于活动状态），并在离开时通过从更新返回 null 来将其删除。因此，会话包含每个活动客户端的（ClientID，1）元素，并且计数计数会话。
 
@@ -184,7 +192,9 @@ Spark Streaming 提供了几个强大的功能来统一流式处理和批处理�
 
 第三，用户通过将 Scala 控制台连接到 SparkStreaming 程序并对 RDD 上的 RDD 运行任意 Spark 操作来在 D-Streams 上互动地执行即时查询。例如，用户可以通过键入以下内容来查询时间范围中的最流行的单词：
 
-    counts.slice\("21:00", "21:05"\).topK\(10\)
+```
+counts.slice\("21:00", "21:05"\).topK\(10\)
+```
 
 与编写离线（基于 Hadoop 的）和在线处理应用程序的开发人员的讨论表明，这些功能具有重要的实用价值。只需在同一代码库中使用这些程序所使用的数据类型和函数就可以节省大量的开发时间，因为流和批处理系统当前有单独的 API。能够以交互方式查询流系统中的状态的能力甚至更具吸引力：它使得调试运行的计算变得简单，或者在定义流作业中的聚合时询问不期望的查询，例如，问题与网站。没有这种能力，用户通常需要等待几十分钟，数据才能进入批处理集群，即使所有相关状态都在流处理节点上的内存中。
 
@@ -280,7 +290,14 @@ D-Streams 的确定性性质使得可能对工作者状态使用两种强大的�
 
 在其他行，所有的机器都进行恢复，同时还处理新的记录。假设在故障之前在集群中存在N个机器，则剩余的N-1个机器现在都必须恢复λ/ N工作，而且还以\(N/N-1\)λ的速率接收新数据。它们赶上到达的流的时间t par满足t par·1 =λ/N + t par·\(N/N-1\)λ，其给出
 
-t par =λ/N/\(1−\(N/N−1\)λ\)≈λ/N\(1−λ\) .
+t par =  
+λ/N  
+/\(1−  
+\(N  
+/N−1\)λ\)  
+≈  
+λ  
+/N\(1−λ\) .
 
 因此，对于更多的节点，并行重新循环与到达流相比，比上游备份快得多。
 
@@ -312,25 +329,455 @@ t par =λ/N/\(1−\(N/N−1\)λ\)≈λ/N\(1−λ\) .
 
 ### Comparison with Commercial Systems（与商业系统的比较）
 
+Spark Streaming 针对 Grep 的每节点吞吐量为640,000条记录，对于4核节点上的 TopKCount 为25万条记录/ s，这与商业单节点流系统报告的速度相当。例如，Oracle CEP 在16核机器上报告了100万条记录/秒的吞吐量，Stream Base 在8个核心上报告了245,000条记录/秒\[40\]，Esper 在4个核上报告了500,000条记录/ s \[13\] \]。虽然没有理由期望 D-Streams 在每个节点上更慢或更快，但主要优点是 Spark Streaming 几乎线性扩展到100个节点。
 
+### Comparison with S4 and Storm
 
+我们还将 Spark Streaming 与两个开源的分布式流系统 S4 和 Storm 进行了比较。两者都是连续的运算符系统，不能在节点之间提供一致性，并且具有有限的容错保证（S4 没有，而 Storm 保证至少一次传送记录）。我们在两个系统中实现了我们的三个应用程序，但是发现 S4 在每个节点可以处理的记录数量/秒（对于 Grep 最多为7500记录/秒，对于 WordCount 最多为1000），这使得它几乎慢10倍火花和风暴。因为 Storm 更快，我们还在30节点集群上测试了它，使用100字节和1000字节的记录。
 
+我们将 Storm 与 Spark Streaming 进行比较，如图9所示，报告吞吐量 Spark 达到亚秒级。我们看到，Storm 仍然受到较小的记录大小的不利影响，对于100字节记录，Grep 为 115k 记录/秒/节点，而 Spark 为 670k。这是尽管在我们的 Storm 实现中采取了几个预防措施来提高性能，包括从 Grep 每100个输入记录发送“批量”更新，并且 Word-Count 和 TopK 中的 “reduce” 节点每秒只发送新的计数，而不是每次计数改变。 Storm 使用1000字节的记录更快，但仍然比 Spark 慢2倍。
 
+![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure9.png)
 
+### 6.2 Fault and Straggler Recovery（故障和分段恢复）
 
+我们使用 WordCount 和 Grep 应用程序在各种条件下评估故障恢复。我们使用具有驻留在 HDFS 中的输入数据的1秒批次，并将数据速率设置为用于 WordCount 的 20MB / s /节点和用于 Grep 的 80MB / s /节点，这导致大约相等的每间隔处理时间 0.58 s 为 WordCount 和 0.54s 为 Grep。因为 WordCount 作业执行增量 reduceByKey，它的沿袭血统图形无限增长（因为每个区间减去过去的30秒的数据），所以我们给它一个10秒的检查点间隔。使用150个 map 作业和10 个 reduce 作业的任务。
 
+我们首先在这些基本条件下报告恢复时间，如图10所示。该图显示了1或2个并发故障之前的故障之前，故障间隔期间和之后的3秒期间内的1秒钟的平均处理时间。 （这些后期的处理被延迟，同时恢复故障间隔的数据，所以我们显示系统如何重新稳定。）我们看到恢复是快速的，延迟最多1秒，即使两个故障和10秒检查点间隔。 WordCount 的恢复需要更长的时间，因为它必须重新计算数据远远回来，而 Grep 只是失去四个任务在每个失败的节点。
 
+![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure10.png)
 
+### Varying the Checkpoint Interval（不同的检查点间隔）
 
+图11显示了更改 WordCount 的检查点间隔的影响。即使每隔30秒进行检查点操作，结果也会延迟最多3.5秒。使用2s检查点，系统恢复仅0.15秒，而仍然支付少于完全复制。
 
+![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure11.png)
 
+### Varying the Number of Nodes（不同节点的数量）
 
+为了看到并行性的效果，我们还尝试了40个节点上的 WordCount 应用程序。如图12所示，将节点加倍将恢复时间减少一半。虽然考虑到 WordCount 中的滑动 reduceByWindow 操作符的线性依赖链，可能似乎很高的并行性，但并行性是因为每个时步上的局部聚合可以并行完成（参见图4） ，这些都是大部分的工作。
 
+![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure12.png)
 
+### Straggler Mitigation 
 
+最后，我们尝试通过启动一个重载 CPU 的60线程进程来减慢其中一个节点而不是杀死它。图13显示了没有分段器的每个间隔的处理时间，其中分段器但是推测执行（备份任务）被禁用，并且分段器和推测被启用。投机显着改善了响应时间。注意，我们当前的实现并不试图记住跨时间的分段节点，因此尽管在慢节点上重复地启动新任务，但是这些改进发生。这表明，即使意外的 stragglers 可以快速处理。完全实现会将慢节点列入黑名单。
 
+![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure13.png)
 
+### 6.3 Real Applications
 
+我们通过移植两个真正的应用程序来评估 D 流的表现力。这两个应用程序都显着地比目前为止所展示的测试程序更复杂，并且除了流式处理外，还利用 D-Streams 执行批处理或交互式处理。
 
+### 6.3.1 Video Distribution Monitoring
 
+Conviva为互联网上的视频分发提供了一个商业管理平台。此平台的一个特点是能够跟踪不同地理区域，CDN，客户端设备和 ISP 的性能，这允许广播公司快速识别和响应交付问题。系统从视频播放器接收事件，并使用它们计算超过五十个度量，包括复杂度量（例如唯一的观看者）和会话级度量（如缓冲比率）。
+
+当前应用程序在两个系统中实现：定制的用于实时数据的分布式流传输系统，以及用于历史数据和即席查询的 Hadoop / Hive 实现。拥有实时数据和历史数据至关重要，因为客户通常希望及时回到调试问题，但在这两个独立系统上实施应用程序会产生重大挑战。首先，这两个实现必须以相同的方式在计算机上进行计算。第二，在数据通过一系列 Hadoop 导入作业到达准备好临时查询的形式之前，存在几分钟的滞后。
+
+我们通过包装 Hadoop 版本中实现的 map 和 reduce 将应用程序移植到 D-Streams。使用500行的 Spark Streaming 程序和另外一个在 Spark 中执行 Hadoop 作业的700行包装程序，我们能够以2秒的间隔计算所有度量（一个2阶段 MapReduce 作业）。我们的代码使用第3.3节中描述的跟踪操作符为每个客户端 ID 构建一个会话状态对象，并在事件到达时更新它，随后是一个滑动恢复 BeyKey 来聚合会话上的度量。
+
+我们测量了应用程序的扩展性能，发现在64个四核 EC2 节点上，它可以处理足够的事件来支持380万个并发观众，这超过了Conviva目前为止遇到的峰值负载。图14（a）示出了缩放。
+
+![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure14.png)
+
+此外，我们使用 D-Streams 添加了原始应用程序中不存在的新功能：即时流状态的即席查询。如图14（b）所示，Spark Streaming 可以在不到一秒钟内从 Scala shell 运行表示会话状态的 RDD 的即席查询。我们的集群可以轻松地在 RAM 中保留十分钟的数据，缩短历史和实时处理之间的差距，并允许单个代码库执行这两种操作。
+
+### 6.3.2 Crowdsourced Traffic Estimation（众包流量估算）
+
+我们将 D 流应用于 Mobile Millennium 交通信息系统\[19\]，这是一个基于机器学习的项目，用于估计城市的汽车交通状况。虽然由于专用传感器测量高速公路的交通是直接的，但是主干道路（城市中的道路）缺乏这样的基础设施。移动千禧通过使用来自装备 GPS 的汽车（例如，出租车）和运行移动应用的手机的众包 GPS 数据来攻克这个问题。
+
+来自 GPS 数据的流量估计是具有挑战性的，因为数据嘈杂（由于高建筑物附近的 GPS 不准确）和稀疏（系统仅每分钟从每个汽车接收一个测量）。移动 Millenium 使用高度计算密集型期望最大化（EM）算法来推断条件，使用马尔可夫链蒙特卡罗和一个流量模型来估计每个道路链路的旅行时间分布。之前的实现\[19\]是 Spark 中的一个迭代批处理作业，运行超过30分钟的数据窗口。
+
+我们使用 EM 算法的在线版本将此应用程序移植到 Spark Streaming，该算法每5秒合并一次新数据。实现是260行的 Spark Streaming 代码，并且在离线程序中包装了现有的 map 和 reduce 函数。另外，我们发现只有使用实时数据可能会导致过拟合，因为在五秒内接收的数据非常稀疏。我们利用 D-Streams 在过去十天内从历史数据中提取数据以解决这个问题。
+
+图15显示了该算法在多达80个四核 EC2 节点上的性能。该算法几乎完美地缩放，因为它是 CPU 限制的，并且提供比批处理版本快10倍的答案。
+
+# ![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure15.png) 7. Discussion
+
+我们已经提出了离散化流（D-Streams），一个用于集群的新的流处理模型。通过将计算分解为短的，确定性的任务和存储基于沿袭的数据结构（RDD）中的状态，D-Streams 可以使用强大的恢复机制，类似于批处理系统中的处理故障和分离器。
+
+也许 D-Streams 的主要限制是它们由于批处理数据而具有固定的最小等待时间。然而，我们已经显示总延迟仍然可以低至1-2秒，这对于许多真实世界的使用情况是足够的。有趣的是，即使一些连续操作系统，如 Borealis 和 TimeStream \[5,33\]，也增加了延迟以确保确定性：Borealis 的 SUnion 运算符和 TimeStream 的 HashPartition 等待在 “heartbeat” 边界批量处理数据，以确定性顺序。因此， D 流的时空是相似的范围系统，同时提供显着更有效的恢复。
+
+除了它们的恢复效益，我们认为 D-Streams 最重要的方面是它们表明流，批处理和交互式计算可以在同一平台上统一。由于“大”数据成为某些应用程序可以操作的唯一数据大小（例如，大型网站上的垃圾邮件检测），组织将需要这些工具来编写使用此数据的低延迟应用程序和更具交互性的应用程序，而不仅仅是到目前为止使用的周期性批处理作业。 D-Streams 在深层次上集成了这些计算模式，因为它们不仅遵循类似的 API，而且遵循与批作业相同的数据结构和容错模型。这使得丰富的功能，如组合流与离线数据或流状态运行专门查询。
+
+最后，虽然我们提出了 D-Streams 的基本实现，但有几个领域可供未来工作：
+
+**Expressiveness（表现力）：**一般来说，由于 D-Stream 抽象主要是一个执行策略，应该可以在其中运行大多数流算法，通过简单的“批处理”算法的执行到步骤和发出状态。这将是有趣的端口语言，如流 SQL \[4\] 或复杂事件处理模型\[14\]。
+
+**Setting the batch interval（设置批处理间隔）：**给定任何应用程序，设置适当的批处理间隔非常重要，因为它直接决定了端到端延迟和流工作负载的吞吐量之间的权衡。目前，开发人员必须探索这种折衷并手动确定间隔。系统可以自动调整它。
+
+**Memory usage：**我们的状态流处理模型生成新的 RDD 来存储每个操作员的状态，每批处理后的数据。在我们目前的实现中，这种高速连续运算符具有可变状态。存储不同版本的状态 RDD 对于系统执行基于沿袭血统的故障恢复至关重要。然而，可以通过仅存储这些状态 RDD 之间的增量来减少存储器使用。
+
+**Approximate results（大致结果）：**除了重新计算丢失的工作之外，处理故障的另一种方法是返回最近的部分结果。 D-Streams通过在父节点全部完成之前简单地启动任务来提供计算部分结果的机会，并且提供沿袭血统数据以知道哪些父节点丢失。
+
+# 8. Related Work
+
+### Streaming Databases
+
+诸如 Aurora，Telegraph，Borealis 和 STREAM 等流数据库是最早研究流媒体的学术系统，并开创了诸如窗口和增量运算符等概念。然而，分布式流数据库（如 Borealis）使用复制或上游备份进行恢复\[20\]。我们对他们做出两个贡献。
+
+首先，D-Streams 提供了一种更有效的恢复机制，并行恢复，运行速度比上游备份更快，无需复制成本。并行恢复是可行的，因为 D-Streams 将计算离散化为无状态的确定性任务。相比之下，流数据库使用有状态的连续运算符模型，并且需要用于复制（例如， Borealis 的 DPC \[5\] 或 Flux \[34\]）和上游备份\[20\]的复杂协议。 Hwang 等人\[21\]唯一的并行恢复协议，只能容忍一个节点故障，不能处理 stragglers。
+
+第二，D-Streams 也允许使用推理执行的 stragglers \[12\]。在连续运算符模型中，解决缓冲区很困难，因为每个节点都有可变状态，不能在另一个节点上重建，而不需要昂贵的串行重放过程。
+
+### Large-scale Streaming
+
+虽然几个最近的系统支持与 D-Stream 类似的高级 API 的流计算，但它们也缺乏离散流模型的故障和分离器恢复优势。
+
+TimeStream \[33\] 在集群上的 Microsoft StreamInsight \[2\] 中运行连续的，有状态的操作符。它使用类似于上游备份的恢复机制，跟踪每个操作员依赖的上游数据，并通过操作员的新副本连续重放。恢复因此发生在每个操作员的单个节点上，并且花费与该操作者的处理窗口成比例的时间（例如，30秒的滑动窗口为30秒）\[33\]。相比之下，D-Streams 使用无状态转换并明确地将状态置于数据结构（RDDs）中，可以（1）异步地对绑定的恢复时间进行检查点，（2）并行重建，跨越数据分区和时间步在亚秒级恢复。 D-Streams 也可以处理 stragglers，而 TimeStream 不行。
+
+Naiad \[27,28\] 自动递增写在 LINQ 中的数据流计算，并且是唯一能够递增迭代计算的。然而，它使用传统的同步检查点来实现容错，并且不能响应 stragglers。
+
+MillWheel \[1\] 使用事件驱动的API 运行状态计算，但通过将所有状态写入复制存储系统（如 BigTable）来处理可靠性。
+
+MapReduce Online\[11\] 是一个运行时的 hadoop 流，它在 maps 和 reduces 之间推送记录，并使用上游备份确保可靠性。但是，它不能恢复具有长期状态的 reduce 任务（用户必须手动将这种状态检查点放入外部系统中），并且不处理 stragglers。Meteor Shower\[41\] 也使用上游备份，并可能需要几十秒来恢复状态。 iMR \[25\] 提供了一个用于日志处理的 MapReduce API，但是在失败时可能丢失数据。 Percolator \[32\] 使用触发器运行增量计算，但不提供高级操作符，如 map 和 join。
+
+最后，据我们所知，几乎没有一个系统支持将流与批处理和即席查询相结合，就像 D-Streams 一样。一些流数据库支持组合表和流\[15\]。
+
+### Message Queueing Systems
+
+类似 Storm，S4 和 Flume \[37,29,3\] 的系统提供了一个消息传递模型，其中用户写有状态代码来处理记录，但它们通常具有有限的容错保证。例如，Storm 确保在源处使用上游备份“至少一次”传递消息，但需要用户手动处理状态恢复，例如通过将所有状态保持在复制数据库中\[38\]。 Trident \[26\] 提供了一个类似于 Storm 上的 LINQ 的功能 API，它自动管理状态。然而，Trident 通过将所有状态存储在复制的数据库中以提供容错，这是昂贵的。
+
+### Incremental Processing
+
+CBP \[24\] 和 Comet \[18\] 通过每几分钟对新数据运行 MapReduce 作业，在传统的 MapReduce 平台上提供“批量增量处理”。虽然这些系统受益于 MapReduce 在每个时间步长内的可扩展性和错误/错误容限，但它们将所有状态存储在跨时间步长的复制磁盘文件系统中，从而导致高额开销和几十秒到几分钟的延迟。相比之下，D-Streams 可以使用 RDD 在内存中保持状态不被复制，并且可以使用沿袭在时间步长上恢复它，从而产生数量级的更低等待时间。 Incoop \[6\] 修改 Hadoop 以支持在输入文件更改时对作业输出进行增量重新计算，并且还包括用于分离器恢复的机制，但它仍然在时间步之间使用复制的磁盘上存储，并且不提供显式流 - 与诸如 windows 之类的概念的接口。
+
+### Parallel Recovery
+
+一个最近的将并行恢复添加到流运算符的系统是 SEEP \[8\]，它允许连续运算符通过标准 API 公开和拆分它们的状态。然而，SEEP 要求针对该 API 对每个操作符进行侵入式重写，并且不扩展到 stragglers。
+
+我们的并行恢复机制也类似于 MapReduce，GFS 和 RAMCloud 中的技术\[12,16,30\]，所有这些都针对故障进行分区恢复工作。我们的贡献是展示如何构造一个流计算，允许跨数据分区和时间使用这种机制，并表明它可以在足够小的时间内实现流。
+
+# 9. Conclusion
+
+我们已经提出了 D-Streams，一种用于分布式流计算的新模型，其能够实现从故障和分离器的快速（通常是次秒）恢复，而没有复制的开销。 D-Streams 通过将数据分成小的时间步长来放弃传统的流传输智慧。这实现了强大的恢复机制，利用跨数据分区和时间的并行性。我们表明，D-Streams 可以支持广泛的运营商，可以实现高每节点吞吐量，线性扩展到100个节点，亚秒级延迟和亚秒故障恢复。最后，因为 D-Streams 使用与批处理平台相同的执行模型，所以它们与批处理和交互式查询无缝组合。我们在 Spark Streaming 中使用了此功能，以便让用户以强大的方式组合这些模型，并展示了如何为两个真实应用程序添加丰富的功能。
+
+Spark Streaming是开源的，现在包含在Spark的http://spark-project.org。
+
+# 10. Acknowledgements
+
+我们感谢 SOSP 审稿人和我们的牧羊人的详细反馈。这项研究得到 NSF CISE Expeditions 奖 CCF-1139158 和 DARPA XData 奖 FA8750-12-2-0331，Google 博士奖学金以及来自 Amazon Web Services，Google，SAP，Cisco，Clearstory Data，Cloudera，Ericsson，Facebook，FitWave，通用电气，Hortonworks，华为，英特尔，微软，NetApp，甲骨文，三星，Splunk，VMware，WANdisco 和雅虎！
+
+# References
+
+\[1\] T. Akidau, A. Balikov, K. Bekiroglu, S. Chernyak,
+
+J. Haberman, R. Lax, S. McVeety, D. Mills,
+
+P. Nordstrom, and S. Whittle. MillWheel: Fault-
+
+tolerant stream processing at internet scale. In
+
+VLDB, 2013.
+
+\[2\] M. H. Ali, C. Gerea, B. S. Raman, B. Sezgin,
+
+T. Tarnavski, T. Verona, P. Wang, P. Zabback,
+
+A. Ananthanarayan, A. Kirilov, M. Lu, A. Raiz-
+
+man, R. Krishnan, R. Schindlauer, T. Grabs,
+
+S. Bjeletich, B. Chandramouli, J. Goldstein,
+
+S. Bhat, Y. Li, V. Di Nicola, X. Wang, D. Maier,
+
+S. Grell, O. Nano, and I. Santos. Microsoft CEP
+
+serverandonlinebehavioraltargeting. Proc.VLDB
+
+Endow., 2\(2\):1558, Aug. 2009.
+
+\[3\] Apache Flume. http://incubator.apache.org/flume/.
+
+\[4\] A. Arasu, B. Babcock, S. Babu, M. Datar,
+
+K. Ito, I. Nishizawa, J. Rosenstein, and J. Widom.
+
+STREAM: The Stanford stream data management
+
+system. SIGMOD 2003.
+
+\[5\] M. Balazinska, H. Balakrishnan, S. R. Madden,
+
+and M. Stonebraker. Fault-tolerance in the Borealis
+
+distributed stream processing system. ACM Trans.
+
+Database Syst., 2008.
+
+\[6\] P. Bhatotia, A. Wieder, R. Rodrigues, U. A. Acar,
+
+and R. Pasquin. Incoop: MapReduce for incremen-
+
+tal computations. In SOCC ’11, 2011.
+
+\[7\] D. Carney, U. C¸etintemel, M. Cherniack, C. Con-
+
+vey, S. Lee, G. Seidman, M. Stonebraker, N. Tat-
+
+bul, and S. Zdonik. Monitoring streams: a new
+
+class of data management applications. In VLDB
+
+’02, 2002.
+
+\[8\] R. Castro Fernandez, M. Migliavacca, E. Kaly-
+
+vianaki, and P. Pietzuch. Integrating scale out and
+
+fault tolerance in stream processing using operator
+
+state management. In SIGMOD, 2013.
+
+\[9\] S. Chandrasekaran, O. Cooper, A. Deshpande,
+
+M. J. Franklin, J. M. Hellerstein, W. Hong, S. Kr-
+
+ishnamurthy, S. Madden, V. Raman, F. Reiss, and
+
+M. Shah. TelegraphCQ: Continuous dataflow pro-
+
+cessing for an uncertain world. In CIDR, 2003.
+
+\[10\] M. Cherniack, H. Balakrishnan, M. Balazinska,
+
+D. Carney, U. Cetintemel, Y. Xing, and S. B.
+
+Zdonik. Scalable distributed stream processing. In
+
+CIDR, 2003.
+
+\[11\] T. Condie, N. Conway, P. Alvaro, and J. M. Heller-
+
+stein. MapReduce online. NSDI, 2010.
+
+\[12\] J. Dean and S. Ghemawat. MapReduce: Simplified
+
+data processing on large clusters. In OSDI, 2004.
+
+\[13\] EsperTech. Performance-related information.
+
+http://esper.codehaus.org/esper/performance/
+
+performance.html, Retrieved March 2013.
+
+\[14\] EsperTech. Tutorial. http://esper.codehaus.org/
+
+tutorials/tutorial/tutorial.html, Retrieved March
+
+2013.
+
+\[15\] M. Franklin, S. Krishnamurthy, N. Conway, A. Li,
+
+A. Russakovsky, and N. Thombre. Continuous an-
+
+alytics: Rethinking query processing in a network-
+
+effect world. CIDR, 2009.
+
+\[16\] S. Ghemawat, H. Gobioff, and S.-T. Leung. The
+
+Google File System. In Proceedings of SOSP ’03,
+
+2003.
+
+\[17\] J. Hammerbacher. Who is using flume in produc-
+
+tion? http://www.quora.com/Flume/Who-is-using-
+
+Flume-in-production/answer/Jeff-Hammerbacher.
+
+\[18\] B. He, M. Yang, Z. Guo, R. Chen, B. Su, W. Lin,
+
+and L. Zhou. Comet: batched stream processing
+
+for data intensive distributed computing. In SoCC,
+
+2010.
+
+\[19\] T. Hunter, T. Moldovan, M. Zaharia, S. Merzgui,
+
+J. Ma, M. J. Franklin, P. Abbeel, and A. M.
+
+Bayen. Scaling the Mobile Millennium system in
+
+the cloud. In SOCC ’11, 2011.
+
+\[20\] J.-H. Hwang, M. Balazinska, A. Rasin,
+
+U. Cetintemel, M. Stonebraker, and S. Zdonik.
+
+High-availability algorithms for distributed stream
+
+processing. In ICDE, 2005.
+
+\[21\] J. hyon Hwang, Y. Xing, and S. Zdonik. A coop-
+
+erative, self-configuring high-availability solution
+
+for stream processing. In ICDE, 2007.
+
+\[22\] M. Isard, M. Budiu, Y. Yu, A. Birrell, and D. Fet-
+
+terly. Dryad: distributed data-parallel programs
+
+from sequential building blocks. In EuroSys 07,
+
+2007.
+
+\[23\] S. Krishnamurthy, M. Franklin, J. Davis, D. Farina,
+
+P. Golovko, A. Li, and N. Thombre. Continuous
+
+analytics over discontinuous streams. In SIGMOD,
+
+2010.
+
+\[24\] D.Logothetis,C.Olston,B.Reed,K.C.Webb,and
+
+K. Yocum. Stateful bulk processing for incremen-
+
+tal analytics. SoCC, 2010.
+
+\[25\] D. Logothetis, C. Trezzo, K. C. Webb, and
+
+K. Yocum. In-situ MapReduce for log processing.
+
+In USENIX ATC, 2011.
+
+\[26\] N. Marz. Trident: a high-level ab-
+
+straction for realtime computation.
+
+http://engineering.twitter.com/2012/08/trident-
+
+high-level-abstraction-for.html.
+
+\[27\] F.McSherry,D.G.Murray,R.Isaacs,andM.Isard.
+
+Differential dataflow. In Conference on Innovative
+
+Data Systems Research \(CIDR\), 2013.
+
+\[28\] D. Murray, F. McSherry, R. Isaacs, M. Isard,
+
+P. Barham, and M. Abadi. Naiad: A timely
+
+dataflow system. In SOSP ’13, 2013.
+
+\[29\] L. Neumeyer, B. Robbins, A. Nair, and A. Kesari.
+
+S4: Distributed stream computing platform. In Intl.
+
+Workshop on Knowledge Discovery Using Cloud
+
+and Distributed Computing Platforms \(KDCloud\),
+
+2010.
+
+\[30\] D. Ongaro, S. M. Rumble, R. Stutsman, J. K.
+
+Ousterhout, and M. Rosenblum. Fast crash recov-
+
+ery in RAMCloud. In SOSP, 2011.
+
+\[31\] Oracle. Oracle complex event processing per-
+
+formance. http://www.oracle.com/technetwork/
+
+middleware/complex-event-processing/overview/
+
+cepperformancewhitepaper-128060.pdf, 2008.
+
+\[32\] D. Peng and F. Dabek. Large-scale incremental
+
+processing using distributed transactions and noti-
+
+fications. In OSDI 2010.
+
+\[33\] Z. Qian, Y. He, C. Su, Z. Wu, H. Zhu, T. Zhang,
+
+L. Zhou, Y. Yu, and Z. Zhang. Timestream: Reli-
+
+able stream computation in the cloud. In EuroSys
+
+’13, 2013.
+
+\[34\] M. Shah, J. Hellerstein, and E. Brewer. Highly
+
+available, fault-tolerant, parallel dataflows. SIG-
+
+MOD, 2004.
+
+\[35\] Z. Shao. Real-time analytics at Face-
+
+book. XLDB 2011, http://www-conf.slac.
+
+stanford.edu/xldb2011/talks/xldb2011 tue 0940
+
+facebookrealtimeanalytics.pdf.
+
+\[36\] U. Srivastava and J. Widom. Flexible time man-
+
+agement in data stream systems. In PODS, 2004.
+
+\[37\] Storm. https://github.com/nathanmarz/storm/wiki.
+
+\[38\] Guaranteed message processing \(Storm wiki\).
+
+https://github.com/nathanmarz/storm/wiki/
+
+Guaranteeing-message-processing.
+
+\[39\] K. Thomas, C. Grier, J. Ma, V. Paxson, and
+
+D. Song. Design and evaluation of a real-time URL
+
+spam filtering service. In IEEE Symposium on Se-
+
+curity and Privacy, 2011.
+
+\[40\] R. Tibbetts. Streambase performance &
+
+scalability characterization. http://www.
+
+streambase.com/wp-content/uploads/downloads/
+
+StreamBase White Paper Performance and
+
+Scalability Characterization.pdf, 2009.
+
+\[41\] H. Wang, L.-S. Peh, E. Koukoumidis, S. Tao, and
+
+M. C. Chan. Meteor shower: A reliable stream
+
+processing system for commodity data centers. In
+
+IPDPS ’12, 2012.
+
+\[42\] Y. Yu, M. Isard, D. Fetterly, M. Budiu,
+
+´
+
+U. Erlings-
+
+son, P. K. Gunda, and J. Currey. DryadLINQ:
+
+A system for general-purpose distributed data-
+
+parallel computing using a high-level language. In
+
+OSDI ’08, 2008.
+
+\[43\] M. Zaharia, M. Chowdhury, T. Das, A. Dave,
+
+J. Ma, M. McCauley, M. Franklin, S. Shenker, and
+
+I. Stoica. Resilient distributed datasets: A fault-
+
+tolerant abstraction for in-memory cluster comput-
+
+ing. In NSDI, 2012.
 
