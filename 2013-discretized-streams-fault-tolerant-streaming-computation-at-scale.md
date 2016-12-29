@@ -359,7 +359,7 @@ Spark Streaming 针对 Grep 的每节点吞吐量为640,000条记录，对于4�
 
 ![](/img/spark_paper/2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale/figure12.png)
 
-### Straggler Mitigation 
+### Straggler Mitigation
 
 最后，我们尝试通过启动一个重载 CPU 的60线程进程来减慢其中一个节点而不是杀死它。图13显示了没有分段器的每个间隔的处理时间，其中分段器但是推测执行（备份任务）被禁用，并且分段器和推测被启用。投机显着改善了响应时间。注意，我们当前的实现并不试图记住跨时间的分段节点，因此尽管在慢节点上重复地启动新任务，但是这些改进发生。这表明，即使意外的 stragglers 可以快速处理。完全实现会将慢节点列入黑名单。
 
@@ -453,7 +453,7 @@ CBP \[24\] 和 Comet \[18\] 通过每几分钟对新数据运行 MapReduce 作�
 
 我们已经提出了 D-Streams，一种用于分布式流计算的新模型，其能够实现从故障和分离器的快速（通常是次秒）恢复，而没有复制的开销。 D-Streams 通过将数据分成小的时间步长来放弃传统的流传输智慧。这实现了强大的恢复机制，利用跨数据分区和时间的并行性。我们表明，D-Streams 可以支持广泛的运营商，可以实现高每节点吞吐量，线性扩展到100个节点，亚秒级延迟和亚秒故障恢复。最后，因为 D-Streams 使用与批处理平台相同的执行模型，所以它们与批处理和交互式查询无缝组合。我们在 Spark Streaming 中使用了此功能，以便让用户以强大的方式组合这些模型，并展示了如何为两个真实应用程序添加丰富的功能。
 
-Spark Streaming是开源的，现在包含在Spark的http://spark-project.org。
+Spark Streaming 是开源的，现在包含在 Spark 的 [http://spark-project.org](http://spark.apache.org/)
 
 # 10. Acknowledgements
 
@@ -489,7 +489,7 @@ serverandonlinebehavioraltargeting. Proc.VLDB
 
 Endow., 2\(2\):1558, Aug. 2009.
 
-\[3\] Apache Flume. http://incubator.apache.org/flume/.
+\[3\] Apache Flume. [http://incubator.apache.org/flume/](http://incubator.apache.org/flume/).
 
 \[4\] A. Arasu, B. Babcock, S. Babu, M. Datar,
 
@@ -559,11 +559,11 @@ data processing on large clusters. In OSDI, 2004.
 
 \[13\] EsperTech. Performance-related information.
 
-http://esper.codehaus.org/esper/performance/
+[http://esper.codehaus.org/esper/performance/](http://esper.codehaus.org/esper/performance/)
 
 performance.html, Retrieved March 2013.
 
-\[14\] EsperTech. Tutorial. http://esper.codehaus.org/
+\[14\] EsperTech. Tutorial. [http://esper.codehaus.org/](http://esper.codehaus.org/)
 
 tutorials/tutorial/tutorial.html, Retrieved March
 
@@ -585,7 +585,7 @@ Google File System. In Proceedings of SOSP ’03,
 
 \[17\] J. Hammerbacher. Who is using flume in produc-
 
-tion? http://www.quora.com/Flume/Who-is-using-
+tion? [http://www.quora.com/Flume/Who-is-using-](http://www.quora.com/Flume/Who-is-using-)
 
 Flume-in-production/answer/Jeff-Hammerbacher.
 
@@ -651,7 +651,7 @@ In USENIX ATC, 2011.
 
 straction for realtime computation.
 
-http://engineering.twitter.com/2012/08/trident-
+[http://engineering.twitter.com/2012/08/trident-](http://engineering.twitter.com/2012/08/trident-)
 
 high-level-abstraction-for.html.
 
@@ -685,7 +685,7 @@ ery in RAMCloud. In SOSP, 2011.
 
 \[31\] Oracle. Oracle complex event processing per-
 
-formance. http://www.oracle.com/technetwork/
+formance. [http://www.oracle.com/technetwork/](http://www.oracle.com/technetwork/)
 
 middleware/complex-event-processing/overview/
 
@@ -713,7 +713,7 @@ MOD, 2004.
 
 \[35\] Z. Shao. Real-time analytics at Face-
 
-book. XLDB 2011, http://www-conf.slac.
+book. XLDB 2011, [http://www-conf.slac](http://www-conf.slac).
 
 stanford.edu/xldb2011/talks/xldb2011 tue 0940
 
@@ -723,11 +723,11 @@ facebookrealtimeanalytics.pdf.
 
 agement in data stream systems. In PODS, 2004.
 
-\[37\] Storm. https://github.com/nathanmarz/storm/wiki.
+\[37\] Storm. [https://github.com/nathanmarz/storm/wiki](https://github.com/nathanmarz/storm/wiki).
 
 \[38\] Guaranteed message processing \(Storm wiki\).
 
-https://github.com/nathanmarz/storm/wiki/
+[https://github.com/nathanmarz/storm/wiki/](https://github.com/nathanmarz/storm/wiki/)
 
 Guaranteeing-message-processing.
 
@@ -741,7 +741,7 @@ curity and Privacy, 2011.
 
 \[40\] R. Tibbetts. Streambase performance &
 
-scalability characterization. http://www.
+scalability characterization. [http://www](http://www).
 
 streambase.com/wp-content/uploads/downloads/
 
