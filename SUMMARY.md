@@ -6,4 +6,5 @@
     * [2012 Discretized Streams An Efficient and Fault-Tolerant Model for Stream Processing on Large Clusters](2012-discretized-streams-an-efficient-and-fault-tolerant-model-for-stream-processing-on-large-clusters.md)
     * [2013 Discretized Streams Fault-Tolerant Streaming Computation at Scale](2013-discretized-streams-fault-tolerant-streaming-computation-at-scale.md)
     * [2015 Spark SQL Relational Data Processing in Spark](2015-spark-sql-relational-data-processing-in-spark.md)
+    * [Resilient Distributed Datasets A Fault Tolerant Abstraction for In-Memory Cluster Computing](resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing.md)
 
