@@ -128,29 +128,39 @@ RDD 本身是由元素类型参数化的静态类型对象。例如，RDD \[Int\
 
 更复杂的数据共享模式发生在 PageRank \[6\] 中。该算法通过将链接到它的文档的贡献相加来迭代地更新每个文档的排名。在每次迭代时，每个文档向其邻居发送 r n 的贡献，其中 r 是其秩，n 是其邻居的数目。然后它将其等级更新为 α/ N +（1-α）Σci，其中总和超过其接收的贡献，N 是文档的总数。我们可以在 Spark 中写如下的 PageRank：
 
-    // Load graph as an RDD of \(URL, outlinks\) pairs
+```
+// Load graph as an RDD of \(URL, outlinks\) pairs
 
-    val links = spark.textFile\(...\).map\(...\).persist\(\)
+val links = spark.textFile\(...\).map\(...\).persist\(\)
 
-    var ranks = // RDD of \(URL, rank\) pairs
+var ranks = // RDD of \(URL, rank\) pairs
 
-    for \(i &lt;- 1 to ITERATIONS\) {
+for \(i &lt;- 1 to ITERATIONS\) {
 
-        // Build an RDD of \(targetURL, float\) pairs
+    // Build an RDD of \(targetURL, float\) pairs
 
-        // with the contributions sent by each page
+    // with the contributions sent by each page
 
-        val contribs = links.join\(ranks\).flatMap {
+    val contribs = links.join\(ranks\).flatMap {
 
-        \(url, \(links, rank\)\) =&gt; links.map\(dest =&gt; \(dest, rank/links.size\)\)
+    \(url, \(links, rank\)\) =&gt;
+```
 
-    }
+    links.map\(dest =&gt; \(dest, rank/links.size\)\)
 
-    // Sum contributions by URL and get new ranks
+```
+}
 
-    ranks = contribs.reduceByKey\(\(x,y\) =&gt; x+y\).mapValues\(sum =&gt; a/N + \(1-a\)\*sum\)
+// Sum contributions by URL and get new ranks
 
-    }
+ranks = contribs.reduceByKey\(\(x,y\) =&gt; x+y\)
+```
+
+    .mapValues\(sum =&gt; a/N + \(1-a\)\*sum\)
+
+```
+}
+```
 
 这个程序导致图3中的 RDD 谱系血统图。在每次迭代中，我们基于来自上一次迭代和静态链接数据集的贡献和排名创建一个新的秩数据集。这个图的一个有趣的特点是它随着迭代次数的增长而增长。因此，在具有许多迭代的作业中，可能有必要可靠地复制等级的一些版本以减少故障恢复时间\[20\]。用户可以使用 RELIABLE 标志调用 persist，这样做。但是，请注意，链接数据集不需要复制，因为它的分区可以通过在输入文件的块上重新运行映射来有效地重建。这个数据集通常比排名要大得多，因为每个文档都有许多链接，但只有一个数字作为排名，因此使用沿袭恢复它可以节省时间，超过检查程序的整个内存状态的系统。
 
@@ -158,7 +168,9 @@ RDD 本身是由元素类型参数化的静态类型对象。例如，RDD \[Int\
 
 最后，我们可以通过控制 RDD 的分区来优化 PageRank 中的通信。如果我们为链接指定分区（例如，通过跨节点的 URL 对链接列表进行哈希分区），我们可以以相同的方式分区排名，并确保链接和排名之间的联接操作不需要通信（因为每个 URL 的排名将在与其链接列表相同的机器上）。我们还可以编写一个自定义 Partitioner 类来将彼此链接到一起的页面分组（例如，按域名分区 URL）。当我们定义链接时，通过调用 partitionBy 可以显示两种优化：
 
-    links = spark.textFile\(...\).map\(...\) .partitionBy\(myPartFunc\).persist\(\)
+```
+links = spark.textFile\(...\).map\(...\) .partitionBy\(myPartFunc\).persist\(\)
+```
 
 在这个初始调用之后，链接和排名之间的联接操作将自动将每个 URL 的贡献聚合到其链接列表所在的计算机上，计算其新排序，并将其与其链接相加。这种类型的跨迭代的一致分区是 Pregel 等专门框架中的主要优化之一。 RDDs 让用户直接表达这个目标。
 
@@ -230,7 +242,7 @@ Scala 解释器通常通过为用户键入的每一行编译一个类，将它�
 
 ### 5.3 Memory Management
 
-Spark 为永久 RDD 的存储提供了三个选项：内存存储作为反序列化的 Java 对象，内存存储作为序列化数据，以及磁盘存储。第一个选项提供最快的性能，因为 Java VM 可以本地访问每个 RDD 元素。第二个选项允许用户在空间有限时选择比 Java 对象图更高的内存高效表示，但代价是性能降低。 第三个选项对于太大而不能保存在 RAM 中但对每次使用重新计算成本高昂的 RDD 非常有用。 
+Spark 为永久 RDD 的存储提供了三个选项：内存存储作为反序列化的 Java 对象，内存存储作为序列化数据，以及磁盘存储。第一个选项提供最快的性能，因为 Java VM 可以本地访问每个 RDD 元素。第二个选项允许用户在空间有限时选择比 Java 对象图更高的内存高效表示，但代价是性能降低。 第三个选项对于太大而不能保存在 RAM 中但对每次使用重新计算成本高昂的 RDD 非常有用。
 
 为了管理有限的可用内存，我们在 RDD 级别使用 LRU 逐出策略。当计算新的 RDD 分区但没有足够的空间来存储它时，我们从最近访问的 RDD 逐出一个分区，除非这是与具有新分区的 RDD 相同的 RDD。在这种情况下，我们保留旧的分区在内存中，以防止循环分区从相同的 RDD 进出。这是很重要的，因为大多数操作都将在整个 RDD 上运行任务，因此很有可能未来将需要已经在内存中的分区。我们发现这个默认策略在所有的应用程序中运行良好，但是我们还通过每个 RDD 的“持久性优先级”为用户提供进一步的控制。
 
@@ -294,7 +306,7 @@ Spark 当前提供了一个用于检查点的 API（REPLICATE 标志为持久化
 
 1. Hadoop 软件堆栈的最小开销
 
-2.  提供数据时 HDFS 的开销
+2. 提供数据时 HDFS 的开销
 
 3. 将二进制记录转换为可用的内存中 Java 对象的反序列化成本。
 
@@ -316,7 +328,7 @@ Spark 当前提供了一个用于检查点的 API（REPLICATE 标志为持久化
 
 ### 6.3 Fault Recovery
 
-我们评估了在 k 平均应用中节点故障后使用沿袭血统重建 RDD 分区的成本。图11比较了在正常操作情况下75节点集群上 k-means 的10次运行时间，其中节点在第6次迭代开始时失败。没有任何失败，每次迭代包括工作在 100 GB 数据的400个任务。 
+我们评估了在 k 平均应用中节点故障后使用沿袭血统重建 RDD 分区的成本。图11比较了在正常操作情况下75节点集群上 k-means 的10次运行时间，其中节点在第6次迭代开始时失败。没有任何失败，每次迭代包括工作在 100 GB 数据的400个任务。
 
 ![](/img/spark_paper/Resilient Distributed Datasets A Fault Tolerant Abstraction for In-Memory Cluster Computing/figure11.png)
 
@@ -424,9 +436,9 @@ RDD 在概念上类似于数据库中的视图，持久 RDD 类似物化视图\[
 
 # References
 
-\[1\] Apache Hive. http://hadoop.apache.org/hive.
+\[1\] Apache Hive. [http://hadoop.apache.org/hive](http://hadoop.apache.org/hive).
 
-\[2\] Scala. http://www.scala-lang.org.
+\[2\] Scala. [http://www.scala-lang.org](http://www.scala-lang.org).
 
 \[3\] G. Ananthanarayanan, A. Ghodsi, S. Shenker, and I. Stoica.
 
