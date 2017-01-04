@@ -14,4 +14,5 @@
             * [Jobs Tab](jobs-tab.md)
             * [Stages Tab](stages-tab.md)
                 * [Stages for All Jobs Page](stages-for-all-jobs-page.md)
+                * [Stage Details](stage-details.md)
 
