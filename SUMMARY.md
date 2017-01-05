@@ -25,4 +25,5 @@
             * [SQL Tab](sql-tab.md)
                 * [SQLListener Spark Listener](sqllistener-spark-listener.md)
             * [JobProgressListener Spark Listener](jobprogresslistener-spark-listener.md)
+            * [StorageStatusListener Spark Listener](storagestatuslistener-spark-listener.md)
 
