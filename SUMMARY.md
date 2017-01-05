@@ -24,4 +24,5 @@
                 * [ExecutorsListener Spark Listener](executorslistener-spark-listener.md)
             * [SQL Tab](sql-tab.md)
                 * [SQLListener Spark Listener](sqllistener-spark-listener.md)
+            * [JobProgressListener Spark Listener](jobprogresslistener-spark-listener.md)
 
