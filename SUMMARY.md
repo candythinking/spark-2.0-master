@@ -30,4 +30,7 @@
             * [RDDOperationGraphListener Spark Listener](rddoperationgraphlistener-spark-listener.md)
             * [SparkUI](sparkui.md)
         * [Spark Submit — spark-submit shell script](spark-submit — spark-submit-shell-script.md)
+            * [SparkSubmitArguments](sparksubmitarguments.md)
+            * [SparkSubmitOptionParser — spark-submit’s Command-Line Parser](sparksubmitoptionparser — spark-submits-command-line-parser.md)
+            * [SparkSubmitCommandBuilder Command Builder](sparksubmitcommandbuilder-command-builder.md)
 
