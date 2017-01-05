@@ -22,4 +22,6 @@
                 * [EnvironmentListener Spark Listener](environmentlistener-spark-listener.md)
             * [Executors Tab](executors-tab.md)
                 * [ExecutorsListener Spark Listener](executorslistener-spark-listener.md)
+            * [SQL Tab](sql-tab.md)
+                * [SQLListener Spark Listener](sqllistener-spark-listener.md)
 
