@@ -19,4 +19,7 @@
             * [Storage Tab](storage-tab.md)
                 * [BlockStatusListener Spark Listener](blockstatuslistener-spark-listener.md)
             * [Environment Tab](environment-tab.md)
+                * [EnvironmentListener Spark Listener](environmentlistener-spark-listener.md)
+            * [Executors Tab](executors-tab.md)
+                * [ExecutorsListener Spark Listener](executorslistener-spark-listener.md)
 
