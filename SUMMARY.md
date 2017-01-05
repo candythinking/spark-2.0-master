@@ -16,4 +16,6 @@
                 * [Stages for All Jobs Page](stages-for-all-jobs-page.md)
                 * [Stage Details](stage-details.md)
                 * [Pool Details](pool-details.md)
+            * [Storage Tab](storage-tab.md)
+                * [BlockStatusListener Spark Listener](blockstatuslistener-spark-listener.md)
 
