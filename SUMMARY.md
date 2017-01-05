@@ -18,4 +18,5 @@
                 * [Pool Details](pool-details.md)
             * [Storage Tab](storage-tab.md)
                 * [BlockStatusListener Spark Listener](blockstatuslistener-spark-listener.md)
+            * [Environment Tab](environment-tab.md)
 
