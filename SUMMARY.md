@@ -29,4 +29,5 @@
             * [StorageListener Spark Listener](storagelistener-spark-listener.md)
             * [RDDOperationGraphListener Spark Listener](rddoperationgraphlistener-spark-listener.md)
             * [SparkUI](sparkui.md)
+        * [Spark Submit — spark-submit shell script](spark-submit — spark-submit-shell-script.md)
 
