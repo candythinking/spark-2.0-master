@@ -88,21 +88,21 @@ StagePage 使用 ExecutorsListener 在任务部分中显示执行器的 stdout �
 
 ### Metrics {#__a_id_metrics_a_metrics}
 
-Scheduler Delay is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Scheduler Delay is…​FIXME
 
-Task Deserialization Time is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Task Deserialization Time is…​FIXME
 
-Result Serialization Time is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Result Serialization Time is…​FIXME
 
-Getting Result Time is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Getting Result Time is…​FIXME
 
-Peak Execution Memory is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Peak Execution Memory is…​FIXME
 
-Shuffle Read Time is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)+
+Shuffle Read Time is…​FIXME+
 
-Executor Computing Time is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Executor Computing Time is…​FIXME
 
-Shuffle Write Time is…​[FIXME](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/GLOSSARY.html#fixme)
+Shuffle Write Time is…​FIXME
 
 ![](/img/mastering-apache-spark/spark core-tools/figure21.png)
 
