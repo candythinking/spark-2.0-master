@@ -33,4 +33,6 @@
             * [SparkSubmitArguments](sparksubmitarguments.md)
             * [SparkSubmitOptionParser — spark-submit’s Command-Line Parser](sparksubmitoptionparser — spark-submits-command-line-parser.md)
             * [SparkSubmitCommandBuilder Command Builder](sparksubmitcommandbuilder-command-builder.md)
+        * [spark-class shell script](spark-class-shell-script.md)
+            * [AbstractCommandBuilder](abstractcommandbuilder.md)
 
