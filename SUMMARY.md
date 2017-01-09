@@ -40,4 +40,6 @@
         * [Spark Architecture](spark-architecture.md)
         * [Driver](driver.md)
         * [Executors](executors.md)
+            * [TaskRunner](taskrunner.md)
+            * [ExecutorSource](executorsource.md)
 
