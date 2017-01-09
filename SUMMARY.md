@@ -39,4 +39,5 @@
     * spark core \/ architecture
         * [Spark Architecture](spark-architecture.md)
         * [Driver](driver.md)
+        * [Executors](executors.md)
 
