@@ -42,4 +42,6 @@
         * [Executors](executors.md)
             * [TaskRunner](taskrunner.md)
             * [ExecutorSource](executorsource.md)
+        * [Master](master.md)
+        * [Workers](workers.md)
 
