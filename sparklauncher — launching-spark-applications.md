@@ -1,4 +1,4 @@
-## `SparkLauncher` — Launching Spark Applications  {#__a_id_sparklauncher_a_code_sparklauncher_code_launching_spark_applications_programmatically}
+## `SparkLauncher` — Launching Spark Applications {#__a_id_sparklauncher_a_code_sparklauncher_code_launching_spark_applications_programmatically}
 
 ## Programmatically {#__a_id_sparklauncher_a_code_sparklauncher_code_launching_spark_applications_programmatically}
 
@@ -45,8 +45,6 @@ val command = new SparkLauncher()
 
 val appHandle = command.startApplication()
 ```
-
-
 
 
 

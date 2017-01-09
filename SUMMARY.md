@@ -36,4 +36,7 @@
         * [spark-class shell script](spark-class-shell-script.md)
             * [AbstractCommandBuilder](abstractcommandbuilder.md)
         * [SparkLauncher — Launching Spark Applications](sparklauncher — launching-spark-applications.md)
+    * spark core \/ architecture
+        * [Spark Architecture](spark-architecture.md)
+        * [Driver](driver.md)
 
