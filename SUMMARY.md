@@ -35,4 +35,5 @@
             * [SparkSubmitCommandBuilder Command Builder](sparksubmitcommandbuilder-command-builder.md)
         * [spark-class shell script](spark-class-shell-script.md)
             * [AbstractCommandBuilder](abstractcommandbuilder.md)
+        * [SparkLauncher — Launching Spark Applications](sparklauncher — launching-spark-applications.md)
 
