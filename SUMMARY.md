@@ -50,4 +50,5 @@
             * [Spark Properties and spark-defaults.conf Properties File](spark-properties-and-spark-defaultsconf-properties-file.md)
             * [Deploy Mode](deploy-mode.md)
         * [SparkContext](sparkcontext.md)
+            * [HeartbeatReceiver RPC Endpoint](heartbeatreceiver-rpc-endpoint.md)
 
