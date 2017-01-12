@@ -351,6 +351,536 @@ It is used in:
 
 当 RDD 被创建时，它属于并且完全由它源自的 Spark 上下文所拥有。 RDD 不能通过设计在 SparkContexts 之间共享。
 
+![](/img/mastering-apache-spark/spark core-rdd/figure3.png)
+
+### Creating RDD — `parallelize`Method {#__a_id_creating_rdds_a_a_id_parallelize_a_creating_rdd_code_parallelize_code_method}
+
+`SparkContext`allows you to create many different RDDs from input sources like:
+
+* Scala’s collections, i.e.`sc.parallelize(0 to 100)`+
+
+* local or remote filesystems, i.e.`sc.textFile("README.md")`
+
+* Any Hadoop`InputSource`using`sc.newAPIHadoopFile`
+
+Read[Creating RDDs](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-rdd.html#creating-rdds)in[RDD - Resilient Distributed Dataset](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-rdd.html).
+
+### Unpersisting RDDs \(Marking RDDs as non-persistent\) — `unpersist`Method {#__a_id_unpersist_a_unpersisting_rdds_marking_rdds_as_non_persistent_code_unpersist_code_method}
+
+它从 master’s Block Manager 中删除一个 RDD（调用 removeRdd（rddId：Int，blocking：Boolean））和内部 persistentRdds 映射。
+
+它最终发布 SparkListenerUnpersistRDD 消息到 listenerBus。
+
+### Setting Checkpoint Directory — `setCheckpointDir`Method {#__a_id_setcheckpointdir_a_setting_checkpoint_directory_code_setcheckpointdir_code_method}
+
+```
+setCheckpointDir(directory: String)
+```
+
+setCheckpointDir 方法用于设置检查点目录...
+
+### Registering Custom Accumulators — `register`Methods {#__a_id_register_a_registering_custom_accumulators_code_register_code_methods}
+
+```
+register(acc: AccumulatorV2[_, _]): Unit
+register(acc: AccumulatorV2[_, _], name: String): Unit
+```
+
+您可以使用专门的方法为长整型，双精度型和集合类型创建内置累加器。
+
+在内部，寄存器将 SparkContext 注册到累加器。
+
+### Creating Built-In Accumulators {#__a_id_creating_accumulators_a_a_id_longaccumulator_a_a_id_doubleaccumulator_a_a_id_collectionaccumulator_a_creating_built_in_accumulators}
+
+```
+longAccumulator: LongAccumulator
+longAccumulator(name: String): LongAccumulator
+doubleAccumulator: DoubleAccumulator
+doubleAccumulator(name: String): DoubleAccumulator
+collectionAccumulator[T]: CollectionAccumulator[T]
+collectionAccumulator[T](name: String): CollectionAccumulator[T]
+```
+
+您可以使用 longAccumulator，doubleAccumulator 或 collectionAccumulator 创建和注册简单和集合值的累加器。
+
+`longAccumulator`returns LongAccumulator with the zero value`0`.
+
+`doubleAccumulator`returns DoubleAccumulator with the zero value`0.0`.
+
+`collectionAccumulator`returns CollectionAccumulator with the zero value`java.util.List[T]`.
+
+```
+scala> val acc = sc.longAccumulator
+acc: org.apache.spark.util.LongAccumulator = LongAccumulator(id: 0, name: None, value: 0)
+
+scala> val counter = sc.longAccumulator("counter")
+counter: org.apache.spark.util.LongAccumulator = LongAccumulator(id: 1, name: Some(counter), value: 0)
+
+scala> counter.value
+res0: Long = 0
+
+scala> sc.parallelize(0 to 9).foreach(n => counter.add(n))
+
+scala> counter.value
+res3: Long = 45
+```
+
+name 输入参数允许您为累加器命名，并将其显示在 Spark UI 中（在给定阶段的“阶段”选项卡下）。
+
+![](/img/mastering-apache-spark/spark core-rdd/figure4.png)
+
+| Tip | You can register custom accumulators using register methods. |
+| :--- | :--- |
+
+
+### Creating Broadcast Variable — `broadcast`Method {#__a_id_broadcast_a_creating_broadcast_variable_code_broadcast_code_method}
+
+```
+broadcast[T](value: T): Broadcast[T]
+```
+
+`broadcast`方法创建广播变量。它是一个共享内存，在驱动程序上和以后在所有 Spark 执行器上具有值（作为广播块）。
+
+```
+val sc: SparkContext = ???
+scala> val hello = sc.broadcast("hello")
+hello: org.apache.spark.broadcast.Broadcast[String] = Broadcast(0)
+```
+
+Spark 将该值传输给 Spark 执行器一次，任务可以共享它，而不会在广播变量使用多次时导致重复的网络传输。
+
+![](/img/mastering-apache-spark/spark core-rdd/figure5.png)
+
+在内部，广播请求当前 BroadcastManager 创建一个新的广播变量。
+
+| Note | 当前 BroadcastManager 是可用的 SparkEnv.broadcastManager 属性，并始终是 BroadcastManager（几乎没有内部配置更改，以反映它运行的地方，即在驱动程序或执行程序内）。 |
+| :---: | :--- |
+
+
+You should see the following INFO message in the logs:
+
+```
+INFO SparkContext: Created broadcast [id] from [callSite]
+```
+
+如果定义了 ContextCleaner，则会注册新的广播变量以进行清理。
+
+Spark 不支持广播 RDD。如下会报错的：
+
+```
+scala> sc.broadcast(sc.range(0, 10))
+java.lang.IllegalArgumentException: requirement failed: Can not directly broadcast RDDs; instead, call collect() and broadcast the result.
+  at scala.Predef$.require(Predef.scala:224)
+  at org.apache.spark.SparkContext.broadcast(SparkContext.scala:1392)
+  ... 48 elided
+```
+
+一旦创建，广播变量（和其他块）显示每个执行者和驱动程序在 Web UI（在执行程序选项卡下）。
+
+![](/img/mastering-apache-spark/spark core-rdd/figure6.png)
+
+### Distribute JARs to workers {#__a_id_jars_a_distribute_jars_to_workers}
+
+您使用 SparkContext.addJar 指定的 jar 将被复制到所有工作节点。
+
+配置设置 spark.jars 是一个逗号分隔的 jar 路径列表，要包含在从此 SparkContext 执行的所有任务中。路径可以是本地文件，HDFS（或其他 Hadoop 支持的文件系统）中的文件，HTTP，HTTPS 或 FTP URI 或每个工作节点上文件的 local：/ path。
+
+```
+scala> sc.addJar("build.sbt")
+15/11/11 21:54:54 INFO SparkContext: Added JAR build.sbt at http://192.168.1.4:49427/jars/build.sbt with timestamp 1447275294457
+```
+
+| Caution | 为什么是 HttpFileServer 用于 addJar？ |
+| :---: | :--- |
+
+
+### `SparkContext`as Application-Wide Counter {#__code_sparkcontext_code_as_application_wide_counter}
+
+SparkContext keeps track\(跟踪\) of:
+
+* shuffle id 使用 nextShuffleId 内部计数器注册 shuffle 服务的 shuffle 依赖。
+
+### Running Job Synchronously — `runJob`Methods {#__a_id_runjob_a_running_job_synchronously_code_runjob_code_methods}
+
+RDD 操作使用 runJob 方法之一运行作业。
+
+```
+runJob[T, U](
+  rdd: RDD[T],
+  func: (TaskContext, Iterator[T]) => U,
+  partitions: Seq[Int],
+  resultHandler: (Int, U) => Unit): Unit
+runJob[T, U](
+  rdd: RDD[T],
+  func: (TaskContext, Iterator[T]) => U,
+  partitions: Seq[Int]): Array[U]
+runJob[T, U](
+  rdd: RDD[T],
+  func: Iterator[T] => U,
+  partitions: Seq[Int]): Array[U]
+runJob[T, U](rdd: RDD[T], func: (TaskContext, Iterator[T]) => U): Array[U]
+runJob[T, U](rdd: RDD[T], func: Iterator[T] => U): Array[U]
+runJob[T, U](
+  rdd: RDD[T],
+  processPartition: (TaskContext, Iterator[T]) => U,
+  resultHandler: (Int, U) => Unit)
+runJob[T, U: ClassTag](
+  rdd: RDD[T],
+  processPartition: Iterator[T] => U,
+  resultHandler: (Int, U) => Unit)
+```
+
+runJob 在 RDD 的一个或多个分区（在 SparkContext 空间中）上执行一个函数，以产生每个分区的值集合。
+
+| Tip | runJob 只能在 SparkContext 没有停止的时候工作。 |
+| :---: | :--- |
+
+
+在内部，runJob 首先确保 SparkContext 不停止。如果是，您应该在日志中看到以下 IllegalStateException 异常：
+
+```
+java.lang.IllegalStateException: SparkContext has been shutdown
+  at org.apache.spark.SparkContext.runJob(SparkContext.scala:1893)
+  at org.apache.spark.SparkContext.runJob(SparkContext.scala:1914)
+  at org.apache.spark.SparkContext.runJob(SparkContext.scala:1934)
+  ... 48 elided
+```
+
+runJob 然后计算调用位置并清除 func 闭包。
+
+You should see the following INFO message in the logs:
+
+```
+INFO SparkContext: Starting job: [callSite]
+```
+
+启用 spark.logLineage（默认情况下不是这样），您应该看到以下 INFO 消息与 toDebugString（在 rdd 上执行）：
+
+```
+INFO SparkContext: RDD's recursive dependencies:
+[toDebugString]
+```
+
+runJob 请求 DAGScheduler 运行作业。
+
+| Tip | runJob 只是为 DAGScheduler 准备输入参数以运行作业。 |
+| :---: | :--- |
+
+
+DAGScheduler 完成并且作业完成后，runJob 停止 ConsoleProgressBar 并执行 rdd 的 RDD 检查点。
+
+| Tip | 对于一些动作，例如 first（）和 lookup（），不需要计算作业中 RDD 的所有分区。和 Spark 知道。 |
+| :---: | :--- |
+
+
+```
+// RDD to work with
+val lines = sc.parallelize(Seq("hello world", "nice to see you"))
+
+import org.apache.spark.TaskContext
+scala> sc.runJob(lines, (t: TaskContext, i: Iterator[String]) => 1) (1)
+res0: Array[Int] = Array(1, 1)  (2)
+```
+
+1. 使用 runJob 在行 RDD 上运行作业，该函数对每个分区（行 RDD）返回1。
+
+2. 你能说说 RDD 的分区数量吗？你的结果 res0 不同于我的吗？为什么？
+
+| Tip | Read TaskContext. |
+| :--- | :--- |
+
+
+运行作业本质上是对 rdd RDD 中的所有或一部分分区执行 func 函数，并将结果作为数组（其中元素是每个分区的结果）返回。
+
+![](/img/mastering-apache-spark/spark core-rdd/figure7.png)
+
+### `postApplicationEnd`Method {#__a_id_postapplicationend_a_code_postapplicationend_code_method}
+
+| Caution | FIXME |
+| :--- | :--- |
+
+
+### `clearActiveContext`Method {#__a_id_clearactivecontext_a_code_clearactivecontext_code_method}
+
+| Caution | FIXME |
+| :--- | :--- |
+
+
+### Stopping`SparkContext` — `stop`Method {#__a_id_stop_a_a_id_stopping_a_stopping_code_sparkcontext_code_code_stop_code_method}
+
+```
+stop(): Unit
+```
+
+stop stops the SparkContext.
+
+在内部，停止使能停止的内部标志。如果已停止，您应该在日志中看到以下 INFO 消息：
+
+```
+INFO SparkContext: SparkContext already stopped.
+```
+
+`stop`then does the following:
+
+1. Removes`_shutdownHookRef`from`ShutdownHookManager`.
+
+2. Posts a`SparkListenerApplicationEnd`\(to`LiveListenerBus`Event Bus\).
+
+3. Stops web UI
+
+4. Requests`MetricSystem`to report metrics\(from all registered sinks\).
+
+5. Stops`ContextCleaner`.
+
+6. Requests`ExecutorAllocationManager`to stop.
+
+7. If`LiveListenerBus`was started,requests`LiveListenerBus`to stop.
+
+8. Requests`EventLoggingListener`to stop.
+
+9. Requests`DAGScheduler`to stop.
+
+10. Requests RpcEnv to stop`HeartbeatReceiver`endpoint.
+
+11. Requests`ConsoleProgressBar`to stop.
+
+12. Clears the reference to`TaskScheduler`, i.e.`_taskScheduler`is`null`.
+
+13. Requests`SparkEnv`to stop and clears`SparkEnv`.
+
+14. Clears`SPARK_YARN_MODE`flag.
+
+15. Clears an active`SparkContext`.
+
+Ultimately, you should see the following INFO message in the logs:
+
+```
+INFO SparkContext: Successfully stopped SparkContext
+```
+
+### Registering SparkListener — `addSparkListener`Method {#__a_id_addsparklistener_a_registering_sparklistener_code_addsparklistener_code_method}
+
+```
+addSparkListener(listener: SparkListenerInterface): Unit
+```
+
+您可以使用 addSparkListener 方法注册自定义 SparkListenerInterface
+
+您还可以使用 spark.extraListeners 设置注册自定义侦听器。
+
+### Custom SchedulerBackend, TaskScheduler and DAGScheduler {#__a_id_custom_schedulers_a_custom_schedulerbackend_taskscheduler_and_dagscheduler}
+
+默认情况下，SparkContext 使用（private \[spark\] 类）org.apache.spark.scheduler.DAGScheduler，但你可以开发自己的定制DAGScheduler 实现，并使用（private \[spark\]）SparkContext.dagScheduler \_ =（ds：DAGScheduler）方法去分配你自己的。
+
+它也适用于 SchedulerBackend 和 TaskScheduler，分别使用 schedulerBackend \_ =（sb：SchedulerBackend）和 taskScheduler \_ =（ts：TaskScheduler）方法。
+
+| Caution | Make it an advanced exercise. |
+| :--- | :--- |
+
+
+### Events {#__a_id_events_a_events}
+
+当 Spark 上下文启动时，它触发 SparkListenerEnvironmentUpdate 和 SparkListenerApplicationStart 消息。
+
+请参阅 SparkContext 的初始化部分。
+
+### Setting Default Logging Level — `setLogLevel`Method {#__a_id_setloglevel_a_a_id_setting_default_log_level_a_setting_default_logging_level_code_setloglevel_code_method}
+
+```
+setLogLevel(logLevel: String)
+```
+
+setLogLevel 允许您在 Spark 应用程序中设置根日志记录级别，例如。spark shell。
+
+在内部，setLogLevel 调用 org.apache.log4j.Level.toLevel（logLevel），然后使用 org.apache.log4j.LogManager.getRootLogger（）。setLevel（level）来设置。
+
+您可以使用 org.apache.log4j.LogManager.getLogger（）直接设置日志记录级别。
+
+```
+LogManager.getLogger("org").setLevel(Level.OFF)
+```
+
+### Closure Cleaning — `clean`Method {#__a_id_clean_a_a_id_closure_cleaning_a_closure_cleaning_code_clean_code_method}
+
+```
+clean(f: F, checkSerializable: Boolean = true): F
+```
+
+每次调用一个 action 时，Spark 在序列化之前先清理闭包，即 action 的主体，然后通过线路发送给执行者。
+
+SparkContext 自带了 clean（f：F，checkSerializable：Boolean = true）方法。它又调用 ClosureCleaner.clean 方法。
+
+ClosureCleaner.clean 方法不仅清洁闭包，而且它也是传递式的，即被引用的闭包被过滤清除。
+
+一个闭包被认为是可序列化的，只要它不显式引用不可序列化的对象。它通过遍历封闭闭包的层次结构来实现这一点，并且清除起始闭包实际上未使用的任何引用。
+
+为 org.apache.spark.util.ClosureCleaner 记录器启用 DEBUG 日志记录级别，以查看类中发生了什么。
+
+将以下行添加到 conf / log4j.properties：
+
+```
+log4j.logger.org.apache.spark.util.ClosureCleaner=DEBUG
+```
+
+使用 DEBUG 日志记录级别，您应该在日志中看到以下消息：
+
+```
++++ Cleaning closure [func] ([func.getClass.getName]) +++
+ + declared fields: [declaredFields.size]
+     [field]
+ ...
++++ closure [func] ([func.getClass.getName]) is now cleaned +++
+```
+
+使用 Serializer 的新实例（作为闭包序列化程序）验证序列化。请参阅序列化。
+
+### Hadoop Configuration {#__a_id_hadoopconfiguration_a_hadoop_configuration}
+
+在创建 SparkContext 时，Hadoop 配置也是如此（作为 org.apache.hadoop.conf.Configuration 的实例，可用作 \_hadoopConfiguration）。
+
+| Note | 使用 SparkHadoopUtil.get.newConfiguration。 |
+| :---: | :--- |
+
+
+如果提供了 SparkConf，它将用于构建如上所述的配置。否则，将返回默认的配置对象。
+
+如果 AWS\_ACCESS\_KEY\_ID 和 AWS\_SECRET\_ACCESS\_KEY 都可用，则会为 Hadoop 配置设置以下设置：
+
+* fs.s3.awsAccessKeyId，fs.s3n.awsAccessKeyId，fs.s3a.access.key 设置为 AWS\_ACCESS\_KEY\_ID 的值
+
+* fs.s3.awsSecretAccessKey，fs.s3n.awsSecretAccessKey 和 fs.s3a.secret.key 设置为 AWS\_SECRET\_ACCESS\_KEY 的值
+
+每一个 spark.hadoop。设置将成为带有前缀 spark.hadoop 的配置的设置。删除键。
+
+spark.buffer.size 的值（默认值：65536）用作 io.file.buffer.size 的值。
+
+### `listenerBus` — `LiveListenerBus`Event Bus {#__a_id_listenerbus_a_code_listenerbus_code_code_livelistenerbus_code_event_bus}
+
+listenerBus 是一个 LiveListenerBus 对象，用作向驱动程序上的其他服务发布事件的机制。
+
+| Note | 它是在 SparkContext 启动时创建和启动的，因为它是一个单 JVM 事件总线，专用于驱动程序。 |
+| :---: | :--- |
+
+
+listenerBus 是 SparkContext 中的私有 \[spark\] 值。
+
+### Time when`SparkContext`was Created — `startTime`Property {#__a_id_starttime_a_time_when_code_sparkcontext_code_was_created_code_starttime_code_property}
+
+```
+startTime: Long
+```
+
+startTime 是 SparkContext 创建时的时间（以毫秒为单位）。
+
+```
+scala> sc.startTime
+res0: Long = 1464425605653
+```
+
+### Spark User — `sparkUser`Property {#__a_id_sparkuser_a_spark_user_code_sparkuser_code_property}
+
+```
+sparkUser: String
+```
+
+sparkUser 是启动 SparkContext 实例的用户。
+
+它是在使用 Utils.getCurrentUserName 创建 SparkContext 时计算的。
+
+### Submitting`ShuffleDependency`for Execution — `submitMapStage`Internal Method {#__a_id_submitmapstage_a_submitting_code_shuffledependency_code_for_execution_code_submitmapstage_code_internal_method}
+
+```
+submitMapStage[K, V, C](
+  dependency: ShuffleDependency[K, V, C]): SimpleFutureAction[MapOutputStatistics]
+```
+
+submitMapStage 将输入 ShuffleDependency 提交给 DAGScheduler 执行，并返回 SimpleFutureAction。
+
+在内部，submitMapStage 首先计算调用站点，并使用 localProperties 提交它。
+
+| Note | 有趣的是，submitMapStage 仅在 Spark SQL 的 ShuffleExchange 物理运算符被执行时使用。 |
+| :---: | :--- |
+
+
+| Note | submitMapStage 似乎与 Adaptive Query Planning / Adaptive Scheduling 相关。 |
+| :---: | :--- |
+
+
+### Calculating Call Site — `getCallSite`Method {#__a_id_getcallsite_a_calculating_call_site_code_getcallsite_code_method}
+
+### `cancelJobGroup`Method {#__a_id_canceljobgroup_a_code_canceljobgroup_code_method}
+
+```
+cancelJobGroup(groupId: String)
+```
+
+cancelJobGroup 请求 DAGSchedule r取消一组活动的 Spark 作业。
+
+### `cancelAllJobs`Method {#__a_id_cancelalljobs_a_code_cancelalljobs_code_method}
+
+### `setJobGroup`Method {#__a_id_setjobgroup_a_code_setjobgroup_code_method}
+
+```
+setJobGroup(
+  groupId: String,
+  description: String,
+  interruptOnCancel: Boolean = false): Unit
+```
+
+### `cleaner`Method {#__a_id_cleaner_a_code_cleaner_code_method}
+
+```
+cleaner: Option[ContextCleaner]
+```
+
+clean 是一个私有的 \[spark\] 方法来获取可选的应用程序范围的 ContextCleaner。
+
+| Note | 当 SparkContext 使用 spark.cleaner.referenceTracking 创建 SparkCleaner 时，Spark 属性启用（默认情况下为）。 |
+| :---: | :--- |
+
+
+### Settings {#__a_id_settings_a_settings}
+
+#### spark.driver.allowMultipleContexts {#__a_id_spark_driver_allowmultiplecontexts_a_spark_driver_allowmultiplecontexts}
+
+引用 org.apache.spark.SparkContext 的 scaladoc：
+
+每个JVM只能有一个 SparkContext。您必须在创建新的 SparkContext 之前停止（）。
+
+但是，您可以使用 spark.driver.allowMultipleContexts 标志控制行为。
+
+它被禁用，即默认情况下为 false。
+
+如果启用（即 true），Spark 会向日志中输出以下 WARN 消息：
+
+```
+WARN Multiple running SparkContexts detected in the same JVM!
+```
+
+如果禁用（默认），它将抛出 SparkException 异常：
+
+```
+Only one SparkContext may be running in this JVM (see SPARK-2243). To ignore this error, set spark.driver.allowMultipleContexts = true. The currently running SparkContext was created at:
+[ctx.creationSite.longForm]
+```
+
+当创建 SparkContext 的实例时，Spark 将当前线程标记为正在创建它（在实例化过程的早期）。
+
+| Caution | 不能保证 Spark 能够与两个或多个 SparkContext 一起正常工作。考虑该功能正在进行中的工作。 |
+| :---: | :--- |
+
+
+### Environment Variables {#__a_id_environment_variables_a_environment_variables}
+
+Table 1. Environment Variables
+
+| Environment Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `SPARK_EXECUTOR_MEMORY` | `1024` | Amount of memory to allocate for a Spark executor in MB.See Executor Memory. |
+| `SPARK_USER` |  | The user who is running`SparkContext`. Available later as sparkUser. |
+
+
+
 
 
 
