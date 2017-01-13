@@ -70,4 +70,8 @@
             * [Actions](actions.md)
         * [Caching and Persistence](caching-and-persistence.md)
             * [StorageLevel](storagelevel.md)
+        * [Partitions and Partitioning](partitions-and-partitioning.md)
+            * [Partition](partition.md)
+            * [Partitioner](partitioner.md)
+                * [HashPartitioner](hashpartitioner.md)
 
