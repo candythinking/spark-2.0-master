@@ -51,4 +51,7 @@
             * [Deploy Mode](deploy-mode.md)
         * [SparkContext](sparkcontext.md)
             * [HeartbeatReceiver RPC Endpoint](heartbeatreceiver-rpc-endpoint.md)
+            * [Inside Creating SparkContext](inside-creating-sparkcontext.md)
+            * [ConsoleProgressBar](consoleprogressbar.md)
+            * [Local Properties — Creating Logical Job Groups](local-properties — creating-logical-job-groups.md)
 
