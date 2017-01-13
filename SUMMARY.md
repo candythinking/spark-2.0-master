@@ -75,4 +75,5 @@
             * [Partitioner](partitioner.md)
                 * [HashPartitioner](hashpartitioner.md)
         * [shuffling](shuffling.md)
+        * [Checkpointing](checkpointing.md)
 
