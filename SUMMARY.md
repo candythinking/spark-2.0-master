@@ -68,4 +68,6 @@
             * [Transformations](transformations.md)
                 * [PairRDDFunctions](pairrddfunctions.md)
             * [Actions](actions.md)
+        * [Caching and Persistence](caching-and-persistence.md)
+            * [StorageLevel](storagelevel.md)
 
