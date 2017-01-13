@@ -74,4 +74,5 @@
             * [Partition](partition.md)
             * [Partitioner](partitioner.md)
                 * [HashPartitioner](hashpartitioner.md)
+        * [shuffling](shuffling.md)
 
