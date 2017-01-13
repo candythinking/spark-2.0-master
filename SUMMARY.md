@@ -64,4 +64,8 @@
             * [HadoopRDD](hadooprdd.md)
             * [ShuffledRDD](shuffledrdd.md)
             * [BlockRDD](blockrdd.md)
+        * [Operators](operators.md)
+            * [Transformations](transformations.md)
+                * [PairRDDFunctions](pairrddfunctions.md)
+            * [Actions](actions.md)
 
