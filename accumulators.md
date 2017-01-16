@@ -140,7 +140,7 @@ println(s"The number of elements is $counter")
 
 #### Example: Distributed Stopwatch {#__a_id_example3_a_example_distributed_stopwatch}
 
-| Note | This is_almost_a raw copy of org.apache.spark.ml.util.DistributedStopwatch. |
+| Note | This is\_almost\_a raw copy of org.apache.spark.ml.util.DistributedStopwatch. |
 | :---: | :--- |
 
 

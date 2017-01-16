@@ -81,7 +81,12 @@
             * [NarrowDependency — Narrow Dependencies](narrowdependency — narrow-dependencies.md)
             * [ShuffleDependency — Shuffle Dependency](shuffledependency — shuffle-dependency.md)
         * [Map\/Reduce-side Aggregator](mapreduce-side-aggregator.md)
-    * spark core \/ optimizations
+    * [spark core \/ optimizations](spark-core--optimizations.md)
         * [Broadcast Variables](broadcast-variables.md)
         * [Accumulators](accumulators.md)
+    * [Spark on YARN](spark-on-yarn.md)
+        * [Spark on YARN](yarnshuffleservice — externalshuffleservice-on-yarn.md)
+        * [YarnShuffleService — ExternalShuffleService on YARN](yarnshuffleservice — externalshuffleservice-on-yarn1.md)
+        * [ExecutorRunnable](executorrunnable.md)
+        * [Client](client.md)
 
