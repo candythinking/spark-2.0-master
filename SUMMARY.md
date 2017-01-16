@@ -81,4 +81,7 @@
             * [NarrowDependency — Narrow Dependencies](narrowdependency — narrow-dependencies.md)
             * [ShuffleDependency — Shuffle Dependency](shuffledependency — shuffle-dependency.md)
         * [Map\/Reduce-side Aggregator](mapreduce-side-aggregator.md)
+    * spark core \/ optimizations
+        * [Broadcast Variables](broadcast-variables.md)
+        * [Accumulators](accumulators.md)
 
