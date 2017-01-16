@@ -77,4 +77,8 @@
         * [shuffling](shuffling.md)
         * [Checkpointing](checkpointing.md)
             * [CheckpointRDD](checkpointrdd.md)
+        * [RDD Dependencies](rdd-dependencies.md)
+            * [NarrowDependency — Narrow Dependencies](narrowdependency — narrow-dependencies.md)
+            * [ShuffleDependency — Shuffle Dependency](shuffledependency — shuffle-dependency.md)
+        * [Map\/Reduce-side Aggregator](mapreduce-side-aggregator.md)
 
