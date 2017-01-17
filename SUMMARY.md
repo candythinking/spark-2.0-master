@@ -89,4 +89,6 @@
         * [YarnShuffleService — ExternalShuffleService on YARN](yarnshuffleservice — externalshuffleservice-on-yarn1.md)
         * [ExecutorRunnable](executorrunnable.md)
         * [Client](client.md)
+        * [YarnRMClient](yarnrmclient.md)
+        * [ApplicationMaster](applicationmaster.md)
 
