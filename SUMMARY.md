@@ -91,4 +91,8 @@
         * [Client](client.md)
         * [YarnRMClient](yarnrmclient.md)
         * [ApplicationMaster](applicationmaster.md)
+            * [AMEndpoint — ApplicationMaster RPC Endpoint](amendpoint — applicationmaster-rpc-endpoint.md)
+        * [YarnClusterManager — ExternalClusterManager for YARN](yarnclustermanager — externalclustermanager-for-yarn.md)
+        * [TaskSchedulers for YARN](taskschedulers-for-yarn.md)
+            * [YarnScheduler](yarnscheduler.md)
 
