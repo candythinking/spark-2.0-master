@@ -190,7 +190,7 @@ heartbeater 是一个守护进程 ScheduledThreadPoolExecutor 与单线程。
 
 您可以在独立主站的 Web UI 中找到作为每个节点的内存显示的值（如下图所示）。
 
-![](/im/mastering-apache-spark/spark core-architecture/figure7.png)
+![](/img/mastering-apache-spark/spark core-architecture/figure7.png)
 
 上图显示了运行 Spark shell 的结果，其中显式地（在命令行上）定义了每个执行器的内存量，即
 
@@ -224,7 +224,7 @@ Every executor registers its own ExecutorSource to report metrics.
 | `spark.executor.logs.rolling.time.interval` |  |  |
 | `spark.executor.port` |  |  |
 | `spark.executor.uri` |  | 相当于`SPARK_EXECUTOR_URI` |
-| `spark.task.maxDirectResultSize` | `1048576B` |   |
+| `spark.task.maxDirectResultSize` | `1048576B` |  |
 
 
 

@@ -131,7 +131,7 @@ registerAM(
 
 最终，registerAM启动记录线程。
 
-![](/img/mastering-apahce-spark/spark on yarn/figure6.png)
+![](/img/mastering-apache-spark/spark on yarn/figure6.png)
 
 ### Running Driver in Cluster Mode \(runDriver method\) {#__a_id_rundriver_a_running_driver_in_cluster_mode_rundriver_method}
 
@@ -231,7 +231,7 @@ sparkContextStopped 将调用传递到清除内部 sparkContextRef 引用（即�
 
 ### Creating ApplicationMaster Instance {#__a_id_creating_instance_a_creating_applicationmaster_instance}
 
-![](/img/mastering-apache-spark/spark on yarn/figure6.png)
+![](/img/mastering-apache-spark/spark on yarn/figure7.png)
 
 当创建 ApplicationMaster 的实例时，它需要 ApplicationMasterArguments 和 YarnRMClient。
 
@@ -277,7 +277,7 @@ INFO ApplicationMaster: Preparing Local resources
 
 * spark.yarn.cache.types
 
-对于 spark.yarn.cache.filename 中的每个文件名，它将 spark.yarn.cache.types 映射到适当的 YARN 的 LocalResourceType 并创建一个新的 YARN LocalResource。 
+对于 spark.yarn.cache.filename 中的每个文件名，它将 spark.yarn.cache.types 映射到适当的 YARN 的 LocalResourceType 并创建一个新的 YARN LocalResource。
 
 | Note | LocalResource 表示运行容器所需的本地资源。 |
 | :---: | :--- |
@@ -452,32 +452,4 @@ addAmIpFilter(): Unit
 在集群部署模式下（当 ApplicationMaster 使用 Web UI 运行时），它将 spark.ui.filters 系统属性设置为 org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter。它还将来自 AmIpFilter（之前计算）的键值配置的系统属性设置为 spark.org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter.param.\[key\] being \[value\]。
 
 在客户端部署模式下（当 ApplicationMaster 在另一个 JVM 甚至是主机而不是 Web UI 上运行时），它只是向 ApplicationMaster（即到 AMEndpoint RPC Endpoint）发送一个 AddWebUIFilter。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

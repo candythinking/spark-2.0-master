@@ -95,4 +95,7 @@
         * [YarnClusterManager — ExternalClusterManager for YARN](yarnclustermanager — externalclustermanager-for-yarn.md)
         * [TaskSchedulers for YARN](taskschedulers-for-yarn.md)
             * [YarnScheduler](yarnscheduler.md)
+            * [YarnClusterScheduler](yarnclusterscheduler.md)
+        * [SchedulerBackends for YARN](schedulerbackends-for-yarn.md)
+            * [YarnSchedulerBackend](yarnschedulerbackend.md)
 
