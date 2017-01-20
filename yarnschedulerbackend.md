@@ -1,16 +1,27 @@
-## YarnSchedulerBackend — Coarse-Grained Scheduler Backend for YARN {#__a_id_yarnschedulerbackend_a_yarnschedulerbackend_coarse_grained_scheduler_backend_for_yarn}
+## YarnSchedulerBackend — Foundation for Coarse-Grained Scheduler Backends for YARN {#__a_id_yarnschedulerbackend_a_yarnschedulerbackend_foundation_for_coarse_grained_scheduler_backends_for_yarn}
 
-YarnSchedulerBackend 是一个用于 YARN 的抽象 CoarseGrainedSchedulerBackend，它包含客户端和集群 YARN 调度程序后端的公共逻辑，即分别为 YarnClientSchedulerBackend 和 YarnClusterSchedulerBackend。
+YarnSchedulerBackend 是一个用于 YARN 的抽象 CoarseGrainedSchedulerBackend，它充当用于 YARN 的具体部署模式特定的 Spark 调度程序后端的基础，即分别用于客户端部署模式和集群部署模式的 YarnClientSchedulerBackend 和 YarnClusterSchedulerBackend。
 
-YarnSchedulerBackend 在 RPC 环境中可用作 YarnScheduler RPC 终端节点（或内部的 yarnSchedulerEndpointRef）。
+YarnSchedulerBackend 在 RPC 环境中将其自身注册为 YarnScheduler RPC endpoint。
 
-YarnSchedulerBackend 期望 TaskSchedulerImpl 和 SparkContext 初始化自身。
+![](/img/mastering-apache-spark/spark on yarn/figure8.png)
 
-它适用于单个 Spark 应用程序（作为 ApplicationId 类型的 appId）
-
-| Caution | 它可能是一个调度程序后端的注释。 |
+| Note | YarnSchedulerBackend 是一个私有的 \[spark\] 抽象类，绝不会直接创建（但只是间接通过具体的实现 YarnClientSchedulerBackend 和 YarnClusterSchedulerBackend）。 |
 | :---: | :--- |
 
+
+Table 1. YarnSchedulerBackend’s Internal Properties
+
+| Name | Initial Value | Description |
+| :--- | :--- | :--- |
+| `minRegisteredRatio` | `0.8`\(when spark.scheduler.minRegisteredResourcesRatio property is undefined\)                                                                   minRegisteredRatio from the parent`CoarseGrainedSchedulerBackend` | Used in sufficientResourcesRegistered. |
+| `yarnSchedulerEndpoint` | YarnSchedulerEndpoint object |  |
+| `yarnSchedulerEndpointRef` | RPC endpoint reference to`YarnScheduler`RPC endpoint | Created when`YarnSchedulerBackend`is created. |
+| `totalExpectedExecutors` | `0` | Updated when Spark on YARN starts \(in client mode or cluster mode\).Initialized to the final value after Spark on YARN is started.Used in sufficientResourcesRegistered. |
+| `askTimeout` | FIXME | FIXME |
+| `appId` | FIXME | FIXME |
+| `attemptId` | \(undefined\) | YARN’s ApplicationAttemptId of a Spark application.Only defined in`cluster`deploy mode.Set when YarnClusterSchedulerBackend starts\(and bindToYarn is called\) using YARN’s`ApplicationMaster.getAttemptId`.Used for applicationAttemptId which is a part of SchedulerBackend Contract. |
+| `shouldResetOnAmRegister` |  | Controls whether to reset`YarnSchedulerBackend`when another`RegisterClusterManager`RPC message arrives and allows resetting internal state after the initial ApplicationManager failed and a new one was registered \(that can only happen in`client`deploy mode\).Disabled \(i.e.`false`\) when YarnSchedulerBackend is created |
 
 ### attemptId Internal Attribute {#__a_id_attemptid_a_attemptid_internal_attribute}
 
@@ -40,7 +51,7 @@ applicationAttemptId(): Option[String]
 
 applicationAttemptId 返回 Spark 应用程序的应用程序尝试 ID。
 
-### Resetting YarnSchedulerBackend {#__a_id_reset_a_resetting_yarnschedulerbackend}
+### Resetting YarnSchedulerBackend — `reset`Method {#__a_id_reset_a_resetting_yarnschedulerbackend_code_reset_code_method}
 
 | Note | `reset`is a part of CoarseGrainedSchedulerBackend Contract. |
 | :--- | :--- |
@@ -58,11 +69,23 @@ def doRequestTotalExecutors(requestedTotal: Int): Boolean
 | :---: | :--- |
 
 
-![](/img/mastering-apache-spark/spark on yarn/figure8.png)
+![](/img/mastering-apache-spark/spark on yarn/figure9.png)
 
 doRequestTotalExecutors 只是使用输入的 requestedTotal 和内部 localityAwareTasks 和 hostToLocalTask​​Count 属性发送阻塞的 RequestExecutors 消息到 YarnScheduler RPC Endpoint。
 
 | Caution | The internal attributes are already set. When and how? |
+| :---: | :--- |
+
+
+### `sufficientResourcesRegistered`Method {#__a_id_sufficientresourcesregistered_a_code_sufficientresourcesregistered_code_method}
+
+sufficientResourcesRegistered 检查 totalRegisteredExecutors 是否大于或等于 totalExpectedExecutors 乘以 minRegisteredRatio。
+
+| Note | 它覆盖父 CoarseGrainedSchedulerBackend.sufficientResourcesRegistered。 |
+| :---: | :--- |
+
+
+| Caution | Where’s this used? |
 | :---: | :--- |
 
 
@@ -110,7 +133,7 @@ minRegisteredRatio 在创建 YarnSchedulerBackend 时设置。
 
 它用于 sufficientResourcesRegistered。
 
-### Starting the Backend \(start method\) {#__a_id_start_a_starting_the_backend_start_method}
+### Starting the Backend — `start`Method {#__a_id_start_a_starting_the_backend_code_start_code_method}
 
 start 创建一个 SchedulerExtensionServiceBinding 对象（使用 SparkContext，appId 和 attemptId）并启动它（使用 SchedulerExtensionServices.start（binding））。
 
@@ -124,10 +147,9 @@ start 创建一个 SchedulerExtensionServiceBinding 对象（使用 SparkContext
 
 ```
 java.lang.IllegalArgumentException: requirement failed: application ID unset
-
 ```
 
-### Stopping the Backend \(stop method\) {#__a_id_stop_a_stopping_the_backend_stop_method}
+### Stopping the Backend — `stop`Method {#__a_id_stop_a_stopping_the_backend_code_stop_code_method}
 
 `stop`调用父 CoarseGrainedSchedulerBackend.requestTotalExecutors（使用（0，0，Map.empty）参数）。
 
@@ -143,7 +165,7 @@ java.lang.IllegalArgumentException: requirement failed: application ID unset
 | :---: | :--- |
 
 
-### Recording Application and Attempt Ids \(bindToYarn method\) {#__a_id_bindtoyarn_a_recording_application_and_attempt_ids_bindtoyarn_method}
+### Recording Application and Attempt Ids — `bindToYarn`Method {#__a_id_bindtoyarn_a_recording_application_and_attempt_ids_code_bindtoyarn_code_method}
 
 ```
 bindToYarn(appId: ApplicationId, attemptId: Option[ApplicationAttemptId]): Unit
@@ -154,6 +176,32 @@ bindToYarn 将内部 appId 和 attemptId 分别设置为输入参数 appId 和 a
 | Note | start requires`appId`. |
 | :--- | :--- |
 
+
+### Requesting YARN for Spark Application’s Current Attempt Id — `applicationAttemptId`Method {#__a_id_applicationattemptid_a_requesting_yarn_for_spark_application_s_current_attempt_id_code_applicationattemptid_code_method}
+
+```
+applicationAttemptId(): Option[String]
+```
+
+| Note | `applicationAttemptId`is a part of SchedulerBackend Contract. |
+| :--- | :--- |
+
+
+`applicationAttemptId`请求内部 YARN 的 ApplicationAttemptId 作为 Spark 应用程序的当前尝试 ID。
+
+### Creating YarnSchedulerBackend Instance {#__a_id_creating_instance_a_creating_yarnschedulerbackend_instance}
+
+| Note | 本节仅介绍实例化基本服务所需的组件。 |
+| :---: | :--- |
+
+
+`YarnSchedulerBackend`takes the following when created:
+
+1. TaskSchedulerImpl
+
+2. SparkContext
+
+`YarnSchedulerBackend`initializes the internal properties.
 
 ### Internal Registries {#__a_id_internal_registries_a_internal_registries}
 
@@ -174,10 +222,4 @@ shouldResetOnAmRegister 控制在另一个 RegisterClusterManager RPC 消息到�
 #### spark.scheduler.minRegisteredResourcesRatio {#__a_id_spark_scheduler_minregisteredresourcesratio_a_spark_scheduler_minregisteredresourcesratio}
 
 `spark.scheduler.minRegisteredResourcesRatio`\(default:`0.8`\)
-
-
-
-
-
-
 

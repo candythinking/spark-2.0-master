@@ -98,4 +98,5 @@
             * [YarnClusterScheduler](yarnclusterscheduler.md)
         * [SchedulerBackends for YARN](schedulerbackends-for-yarn.md)
             * [YarnSchedulerBackend](yarnschedulerbackend.md)
+            * [YarnClientSchedulerBackend](yarnclientschedulerbackend.md)
 
