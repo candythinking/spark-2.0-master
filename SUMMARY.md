@@ -103,4 +103,10 @@
       * [YarnSchedulerEndpoint RPC Endpoint](yarnschedulerendpoint-rpc-endpoint.md)
     * [YarnAllocator ](yarnallocator.md)
     * [Introduction to Hadoop YARN](introduction-to-hadoop-yarn.md)
+    * [Setting up YARN Cluster](setting-up-yarn-cluster.md)
+    * [Kerberos](kerberos.md)
+      * [ConfigurableCredentialManager](kerberos/configurablecredentialmanager.md)
+    * [ClientDistributedCacheManager](clientdistributedcachemanager.md)
+    * [YarnSparkHadoopUtil](yarnsparkhadooputil.md)
+    * [Settings](settings.md)
 
