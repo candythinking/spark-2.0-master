@@ -116,4 +116,7 @@
     * [Datasets — Strongly-Typed DataFrames with Encoders](spark-sql/datasets-strongly-typed-dataframes-with-encoders.md)
       * [Encoders — Internal Row Converters](spark-sql/datasets-strongly-typed-dataframes-with-encoders/encoders-internal-row-converters.md)
       * [InternalRow — Internal Binary Row Format](spark-sql/datasets-strongly-typed-dataframes-with-encoders/internalrow-internal-binary-row-format.md)
+    * [DataFrame — Dataset of Rows](spark-sql/dataframe-dataset-of-rows.md)
+      * [Row](spark-sql/dataframe-dataset-of-rows/row.md)
+      * [RowEncoder — DataFrame Encoder](spark-sql/dataframe-dataset-of-rows/rowencoder-dataframe-encoder.md)
 
