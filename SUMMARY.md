@@ -112,4 +112,8 @@
   * [spark sql](spark-sql.md)
     * [Spark SQL — Structured Queries on Large Scale](spark-sql/spark-sql-structured-queries-on-large-scale.md)
     * [SparkSession — The Entry Point to Spark SQL](spark-sql/sparksession-the-entry-point-to-spark-sql.md)
+      * [Builder — Building SparkSession with Fluent API](spark-sql/sparksession-the-entry-point-to-spark-sql/builder-building-sparksession-with-fluent-api.md)
+    * [Datasets — Strongly-Typed DataFrames with Encoders](spark-sql/datasets-strongly-typed-dataframes-with-encoders.md)
+      * [Encoders — Internal Row Converters](spark-sql/datasets-strongly-typed-dataframes-with-encoders/encoders-internal-row-converters.md)
+      * [InternalRow — Internal Binary Row Format](spark-sql/datasets-strongly-typed-dataframes-with-encoders/internalrow-internal-binary-row-format.md)
 
