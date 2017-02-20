@@ -109,4 +109,7 @@
     * [ClientDistributedCacheManager](clientdistributedcachemanager.md)
     * [YarnSparkHadoopUtil](yarnsparkhadooputil.md)
     * [Settings](settings.md)
+  * [spark sql](spark-sql.md)
+    * [Spark SQL — Structured Queries on Large Scale](spark-sql/spark-sql-structured-queries-on-large-scale.md)
+    * [SparkSession — The Entry Point to Spark SQL](spark-sql/sparksession-the-entry-point-to-spark-sql.md)
 
