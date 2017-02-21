@@ -120,5 +120,8 @@
       * [Row](spark-sql/dataframe-dataset-of-rows/row.md)
       * [RowEncoder — DataFrame Encoder](spark-sql/dataframe-dataset-of-rows/rowencoder-dataframe-encoder.md)
     * [Schema — Structure of Data](spark-sql/schema-structure-of-data.md)
-      * StructType
+      * [StructType](spark-sql/schema-structure-of-data/structtype.md)
+      * [StructField](spark-sql/schema-structure-of-data/structfield.md)
+      * [Data Types](spark-sql/schema-structure-of-data/data-types.md)
+    * [Dataset Operators](spark-sql/dataset-operators.md)
 
