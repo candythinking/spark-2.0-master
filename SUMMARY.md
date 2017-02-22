@@ -124,4 +124,6 @@
       * [StructField](spark-sql/schema-structure-of-data/structfield.md)
       * [Data Types](spark-sql/schema-structure-of-data/data-types.md)
     * [Dataset Operators](spark-sql/dataset-operators.md)
+      * [Dataset Columns](spark-sql/dataset-operators/dataset-columns.md)
+      * [Standard Functions — functions object](spark-sql/dataset-operators/standard-functions-functions-object.md)
 
