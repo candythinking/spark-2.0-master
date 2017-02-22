@@ -126,4 +126,10 @@
     * [Dataset Operators](spark-sql/dataset-operators.md)
       * [Dataset Columns](spark-sql/dataset-operators/dataset-columns.md)
       * [Standard Functions — functions object](spark-sql/dataset-operators/standard-functions-functions-object.md)
+      * [UDFs — User-Defined Functions](spark-sql/dataset-operators/udfs-user-defined-functions.md)
+      * [Aggregation — Typed and Untyped Grouping](spark-sql/dataset-operators/aggregation-typed-and-untyped-grouping.md)
+      * [UserDefinedAggregateFunction — User-Defined Aggregate Functions \(UDAFs\).md\)](spark-sql/dataset-operators/userdefinedaggregatefunction-user-defined-aggregate-functions-(udafs)
+      * [Window Aggregate Operators — Windows](spark-sql/dataset-operators/window-aggregate-operators-windows.md)
+      * [Join Operators](spark-sql/dataset-operators/join-operators.md)
+      * [Caching](spark-sql/dataset-operators/caching.md)
 
