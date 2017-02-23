@@ -144,4 +144,5 @@
   * [Spark MLlib](spark-mllib.md)
     * [Spark MLlib](spark-mllib/spark-mllib.md)
     * [ML Pipelines and PipelineStages](spark-mllib/ml-pipelines-and-pipelinestages.md)
+      * [ML Pipeline Components — Transformers](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-components-transformers.md)
 
