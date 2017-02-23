@@ -132,4 +132,12 @@
       * [Window Aggregate Operators — Windows](spark-sql/dataset-operators/window-aggregate-operators-windows.md)
       * [Join Operators](spark-sql/dataset-operators/join-operators.md)
       * [Caching](spark-sql/dataset-operators/caching.md)
+    * [DataSource API — Loading and Saving Datasets](spark-sql/datasource-api-loading-and-saving-datasets.md)
+      * [DataFrameReader — Reading from External Data Sources](spark-sql/datasource-api-loading-and-saving-datasets/dataframereader-reading-from-external-data-sources.md)
+      * [DataFrameWriter](spark-sql/datasource-api-loading-and-saving-datasets/dataframewriter.md)
+      * [DataSource — Pluggable Data Sources](spark-sql/datasource-api-loading-and-saving-datasets/datasource-pluggable-data-sources.md)
+      * [DataSourceRegister](spark-sql/datasource-api-loading-and-saving-datasets/datasourceregister.md)
+        * [CSVFileFormat](spark-sql/datasource-api-loading-and-saving-datasets/datasourceregister/csvfileformat.md)
+        * [ParquetFileFormat](spark-sql/datasource-api-loading-and-saving-datasets/datasourceregister/parquetfileformat.md)
+      * [Custom Formats](spark-sql/datasource-api-loading-and-saving-datasets/custom-formats.md)
 
