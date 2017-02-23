@@ -140,4 +140,5 @@
         * [CSVFileFormat](spark-sql/datasource-api-loading-and-saving-datasets/datasourceregister/csvfileformat.md)
         * [ParquetFileFormat](spark-sql/datasource-api-loading-and-saving-datasets/datasourceregister/parquetfileformat.md)
       * [Custom Formats](spark-sql/datasource-api-loading-and-saving-datasets/custom-formats.md)
+    * [Datasets vs DataFrames vs RDDs](spark-sql/datasets-vs-dataframes-vs-rdds.md)
 
