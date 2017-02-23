@@ -141,4 +141,7 @@
         * [ParquetFileFormat](spark-sql/datasource-api-loading-and-saving-datasets/datasourceregister/parquetfileformat.md)
       * [Custom Formats](spark-sql/datasource-api-loading-and-saving-datasets/custom-formats.md)
     * [Datasets vs DataFrames vs RDDs](spark-sql/datasets-vs-dataframes-vs-rdds.md)
+  * [Spark MLlib](spark-mllib.md)
+    * [Spark MLlib](spark-mllib/spark-mllib.md)
+    * [ML Pipelines and PipelineStages](spark-mllib/ml-pipelines-and-pipelinestages.md)
 
