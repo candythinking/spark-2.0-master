@@ -158,5 +158,7 @@
     * [Vector](spark-mllib/vector.md)
     * [LabeledPoint](spark-mllib/labeledpoint.md)
     * [Streaming MLlib](spark-mllib/streaming-mllib.md)
-    * [GeneralizedLinearRegression \(GLM\)](spark-mllib/generalizedlinearregression-(glm).md)
+    * [GeneralizedLinearRegression \(GLM\).md\)](spark-mllib/generalizedlinearregression-(glm)
+  * Structured Streaming
+    * [Structured Streaming — Streaming Datasets](structured-streaming-streaming-datasets.md)
 

@@ -50,23 +50,5 @@ GeneralizedLinearRegression是一个具有Vector类型特征的回归函数，�
 
 ### Regressor {#__a_id_regressor_a_regressor}
 
-`Regressor`is a custom[Predictor](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-mllib/spark-mllib-estimators.html#Predictor).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+`Regressor`is a custom Predictor.
 
