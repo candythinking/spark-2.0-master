@@ -149,4 +149,9 @@
       * [ML Pipeline Components — Estimators](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-components-estimators.md)
       * [ML Pipeline Models](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-models.md)
       * [Evaluators](spark-mllib/ml-pipelines-and-pipelinestages/evaluators.md)
+      * [CrossValidator](spark-mllib/ml-pipelines-and-pipelinestages/crossvalidator.md)
+      * [Params \(and ParamMaps\).md\)](spark-mllib/ml-pipelines-and-pipelinestages/params-(and-parammaps)
+      * [ML Persistence — Saving and Loading Models and Pipelines](spark-mllib/ml-pipelines-and-pipelinestages/ml-persistence-saving-and-loading-models-and-pipelines.md)
+      * [Example — Text Classification](spark-mllib/ml-pipelines-and-pipelinestages/example-text-classification.md)
+      * [Example — Linear Regression](spark-mllib/ml-pipelines-and-pipelinestages/example-linear-regression.md)
 
