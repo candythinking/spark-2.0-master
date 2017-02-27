@@ -154,4 +154,9 @@
       * [ML Persistence — Saving and Loading Models and Pipelines](spark-mllib/ml-pipelines-and-pipelinestages/ml-persistence-saving-and-loading-models-and-pipelines.md)
       * [Example — Text Classification](spark-mllib/ml-pipelines-and-pipelinestages/example-text-classification.md)
       * [Example — Linear Regression](spark-mllib/ml-pipelines-and-pipelinestages/example-linear-regression.md)
+    * [Latent Dirichlet Allocation \(LDA\).md\)](spark-mllib/latent-dirichlet-allocation-(lda)
+    * [Vector](spark-mllib/vector.md)
+    * [LabeledPoint](spark-mllib/labeledpoint.md)
+    * [Streaming MLlib](spark-mllib/streaming-mllib.md)
+    * [GeneralizedLinearRegression \(GLM\)](spark-mllib/generalizedlinearregression-(glm).md)
 
