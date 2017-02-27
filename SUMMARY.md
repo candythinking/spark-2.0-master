@@ -145,4 +145,8 @@
     * [Spark MLlib](spark-mllib/spark-mllib.md)
     * [ML Pipelines and PipelineStages](spark-mllib/ml-pipelines-and-pipelinestages.md)
       * [ML Pipeline Components — Transformers](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-components-transformers.md)
+        * [Tokenizer](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-components-transformers/tokenizer.md)
+      * [ML Pipeline Components — Estimators](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-components-estimators.md)
+      * [ML Pipeline Models](spark-mllib/ml-pipelines-and-pipelinestages/ml-pipeline-models.md)
+      * [Evaluators](spark-mllib/ml-pipelines-and-pipelinestages/evaluators.md)
 

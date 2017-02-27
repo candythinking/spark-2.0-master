@@ -92,26 +92,27 @@ Spark 1.5在用于关联规则生成和顺序模式挖掘的新算法的频繁�
 
 1. [ ] [Frequent Pattern Mining in MLlib User Guide](https://spark.apache.org/docs/latest/mllib-frequent-pattern-mining.html)
 
-* [ ] **frequent pattern mining**
+2. [ ] **frequent pattern mining**
 
-1. 揭示了特定时期最常访问的网站
-2. 找到在特定区域中产生最多流量的流行路由路径
+3. 揭示了特定时期最常访问的网站
 
-* [ ] 将其输入建模为一组事务\(**transactions**\)，例如节点的路径。
+4. 找到在特定区域中产生最多流量的流行路由路径
 
-* [ ] 事务是一组项目\(**items**\)，例如网络节点。
+5. [ ] 将其输入建模为一组事务\(**transactions**\)，例如节点的路径。
 
-* [ ] 该算法寻找在交易中出现的项目的公共子集，例如经常被遍历的网络的子路径。
+6. [ ] 事务是一组项目\(**items**\)，例如网络节点。
 
-* [ ] 一个朴素的解决方案：生成所有可能的项集并计算它们的出现
+7. [ ] 该算法寻找在交易中出现的项目的公共子集，例如经常被遍历的网络的子路径。
 
-* [ ] 当子集出现在所有事务的最小比例 - 支持中时，它被认为是模式。
+8. [ ] 一个朴素的解决方案：生成所有可能的项集并计算它们的出现
 
-* [ ] 事务中的项是无序的
+9. [ ] 当子集出现在所有事务的最小比例 - 支持中时，它被认为是模式。
 
-* [ ] 分析网络日志中的流量模式
+10. [ ] 事务中的项是无序的
 
-* [ ] 该算法找到所有频繁项集，而不生成和测试所有候选项
+11. [ ] 分析网络日志中的流量模式
+
+12. [ ] 该算法找到所有频繁项集，而不生成和测试所有候选项
 
 由过滤事务构建和生成的后缀树（FP-树）
 
@@ -170,22 +171,6 @@ MLlib中的迭代聚类（PIC），一种简单和可扩展的图聚类方法
 * [New MLlib Algorithms in Spark 1.3: FP-Growth and Power Iteration Clustering](https://databricks.com/blog/2015/04/17/new-mllib-algorithms-in-spark-1-3-fp-growth-and-power-iteration-clustering.html)
 
 * \(video\)[GOTO 2015 • A Taste of Random Decision Forests on Apache Spark • Sean Owen](https://youtu.be/ObiCMJ24ezs)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
