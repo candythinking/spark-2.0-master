@@ -79,6 +79,29 @@ res2: Boolean = false
 
 结构化流引入了无限数据集的流数据集，其具有像输入streaming sources和输出streaming sinks，事件时间\(event time\)，窗口\(windowing\)和会话\(sessions\)。您可以指定流数据集的输出模式，这是在有新数据可用时写入流接收器的内容。
 
+| Tip | A Dataset is streaming when its logical plan is streaming. |
+| :---: | :--- |
+
+
+结构化流由org.apache.spark.sql.streaming包中的以下数据抽象定义：
+
+* StreamingQuery 
+* Streaming Source
+* Streaming Sink
+* StreamingQueryManager
+
+数据集是Spark SQL的结构化数据视图，结构化流检查每个触发器（时间）的新数据的输入源并执行（连续）查询。
+
+| Tip | Watch [SPARK-8360 Streaming DataFrames](https://issues.apache.org/jira/browse/SPARK-8360) to track progress of the feature. |
+| :---: | :--- |
+
+
+| Tip | Read the official programming guide of Spark about [Structured Streaming](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html). |
+| :---: | :--- |
+
+
+| Note | 该功能也称为Streaming Spark SQL查询，流式DataFrames，连续数据框架或连续查询。在Spark项目结算结构化流之前，有很多名字。 |
+| :---: | :--- |
 
 
 
