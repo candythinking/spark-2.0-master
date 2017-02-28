@@ -90,6 +90,7 @@ res2: Boolean = false
 * Streaming Source
 
 * Streaming Sink
+
 * StreamingQueryManager
 
 数据集是Spark SQL的结构化数据视图，结构化流检查每个触发器（时间）的新数据的输入源并执行（连续）查询。
@@ -106,7 +107,9 @@ res2: Boolean = false
 | :---: | :--- |
 
 
-## Example — Streaming Query for Running Counts \(over Words from Socket with Output to Console\)
+## Example — Streaming Query for Running Counts \(over
+
+Words from Socket with Output to Console\)
 
 | Note | The example is "borrowed" from [the official documentation of Spark](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html). Changes and errors are only mine. |
 | :---: | :--- |
@@ -137,7 +140,7 @@ val query = counter.writeStream
 query.stop
 ```
 
-## Example — Streaming Query over CSV Files with Output to Console Every 5 Seconds
+## Example — Streaming Query over CSV Files with Output to Console Every 5 Seconds
 
 下面你可以找到一个完整的例子，一个DataFrame的数据每5秒钟从一个给定的模式的csv格式的csv-logs文件的流式查询。
 
@@ -221,31 +224,17 @@ truct<name:string,city:string,country:string,age:int,alive:boolean>
 
 ## Further reading or watching
 
-[Structured Streaming In Apache Spark](https://databricks.com/blog/2016/07/28/structured-streaming-in-apache-spark.html)
+[Structured Streaming In Apache Spark](https://databricks.com/blog/2016/07/28/structured-streaming-in-apache-spark.html)
 
 \(video\) [The Future of Real Time in Spark](https://youtu.be/oXkxXDG0gNk) from Spark Summit East 2016 in which
 
 Reynold Xin presents the concept of Streaming DataFrames to the public.
 
-\(video\) [Structuring Spark: DataFrames, Datasets, and Streaming](https://youtu.be/i7l3JQRx7Qw?t=19m15s)
+\(video\) [Structuring Spark: DataFrames, Datasets, and Streaming](https://youtu.be/i7l3JQRx7Qw?t=19m15s)
 
-[What Spark’s Structured Streaming really means](http://www.infoworld.com/article/3052924/analytics/what-sparks-structured-streaming-really-means.html)
+[What Spark’s Structured Streaming really means](http://www.infoworld.com/article/3052924/analytics/what-sparks-structured-streaming-really-means.html)
 
 \(video\) [A Deep Dive Into Structured Streaming](https://youtu.be/rl8dIzTpxrI) by Tathagata "TD" Das from Spark
 
 Summit 2016
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
