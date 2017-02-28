@@ -7,5 +7,15 @@
 * spark  paper 的翻译
 * mastering-apache-spark  2.0 版书籍的部分核心内容翻译
 
+            1.spark core
+
+            2.spark on yarn
+
+            3.spark sql
+
+            4.spark MLlib
+
+            5.spark structured streaming
+
 
 
