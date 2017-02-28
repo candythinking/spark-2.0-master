@@ -85,8 +85,10 @@ res2: Boolean = false
 
 结构化流由org.apache.spark.sql.streaming包中的以下数据抽象定义：
 
-* StreamingQuery 
+* StreamingQuery
+
 * Streaming Source
+
 * Streaming Sink
 * StreamingQueryManager
 
@@ -104,13 +106,134 @@ res2: Boolean = false
 | :---: | :--- |
 
 
+## Example — Streaming Query for Running Counts \(over Words from Socket with Output to Console\)
+
+| Note | The example is "borrowed" from [the official documentation of Spark](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html). Changes and errors are only mine. |
+| :---: | :--- |
 
 
+| Tip | 在运行示例之前，您需要先运行nc -lk 9999。 |
+| :---: | :--- |
 
 
+```
+val lines = spark.readStream
+.format("socket")
+.option("host", "localhost")
+.option("port", 9999)
+.load
+.as[String]
+val words = lines.flatMap(_.split("\\W+"))
+scala> words.printSchema
+root
+|-- value: string (nullable = true)
+val counter = words.groupBy("value").count
+// nc -lk 9999 is supposed to be up at this point
+import org.apache.spark.sql.streaming.OutputMode.Complete
+val query = counter.writeStream
+.outputMode(Complete)
+.format("console")
+.start
+query.stop
+```
+
+## Example — Streaming Query over CSV Files with Output to Console Every 5 Seconds
+
+下面你可以找到一个完整的例子，一个DataFrame的数据每5秒钟从一个给定的模式的csv格式的csv-logs文件的流式查询。
+
+| Tip | 复制并粘贴到Spark Shell中：粘贴模式运行它。 |
+| :---: | :--- |
 
 
+```
+// Explicit schema with nullables false
+import org.apache.spark.sql.types._
+val schemaExp = StructType(
+StructField("name", StringType, false) ::
+StructField("city", StringType, true) ::
+StructField("country", StringType, true) ::
+StructField("age", IntegerType, true) ::
+StructField("alive", BooleanType, false) :: Nil
+)
+// Implicit inferred schema
+val schemaImp = spark.read
+.format("csv")
+.option("header", true)
+.option("inferSchema", true)
+.load("csv-logs")
+.schema
+val in = spark.readStream
+.schema(schemaImp)
+.format("csv")
+.option("header", true)
+.option("maxFilesPerTrigger", 1)
+.load("csv-logs")
+scala> in.printSchema
+root
+|-- name: string (nullable = true)
+|-- city: string (nullable = true)
+|-- country: string (nullable = true)
+|-- age: integer (nullable = true)
+|-- alive: boolean (nullable = true)
+println("Is the query streaming" + in.isStreaming)
+println("Are there any streaming queries?" + spark.streams.active.isEmpty)
+import scala.concurrent.duration._
+import org.apache.spark.sql.streaming.ProcessingTime
+import org.apache.spark.sql.streaming.OutputMode.Append
+val out = in.writeStream
+.format("console")
+.trigger(ProcessingTime(5.seconds))
+.queryName("consoleStream")
+.outputMode(Append)
+.start()
+16/07/13 12:32:11 TRACE FileStreamSource: Listed 3 file(s) in 4.274022 ms
+16/07/13 12:32:11 TRACE FileStreamSource: Files are:
+file:///Users/jacek/dev/oss/spark/csv-logs/people-1.csv
+file:///Users/jacek/dev/oss/spark/csv-logs/people-2.csv
+file:///Users/jacek/dev/oss/spark/csv-logs/people-3.csv
+16/07/13 12:32:11 DEBUG FileStreamSource: New file: file:///Users/jacek/dev/oss/spark/
+csv-logs/people-1.csv
+16/07/13 12:32:11 TRACE FileStreamSource: Number of new files = 3
+16/07/13 12:32:11 TRACE FileStreamSource: Number of files selected for batch = 1
+16/07/13 12:32:11 TRACE FileStreamSource: Number of seen files = 1
+16/07/13 12:32:11 INFO FileStreamSource: Max batch id increased to 0 with 1 new files
+16/07/13 12:32:11 INFO FileStreamSource: Processing 1 files from 0:0
+16/07/13 12:32:11 TRACE FileStreamSource: Files are:
+file:///Users/jacek/dev/oss/spark/csv-logs/people-1.csv
+-------------------------------------------
+Batch: 0
+-------------------------------------------
++-----+--------+-------+---+-----+
+| name| city|country|age|alive|
++-----+--------+-------+---+-----+
+|Jacek|Warszawa| Polska| 42| true|
++-----+--------+-------+---+-----+
+spark.streams
+.active
+.foreach(println)
+// Streaming Query - consoleStream [state = ACTIVE]
+scala> spark.streams.active(0).explain
+== Physical Plan ==
+*Scan csv [name#130,city#131,country#132,age#133,alive#134] Format: CSV, InputPaths: f
+ile:/Users/jacek/dev/oss/spark/csv-logs/people-3.csv, PushedFilters: [], ReadSchema: s
+truct<name:string,city:string,country:string,age:int,alive:boolean>
+```
 
+## Further reading or watching
+
+[Structured Streaming In Apache Spark](https://databricks.com/blog/2016/07/28/structured-streaming-in-apache-spark.html)
+
+\(video\) [The Future of Real Time in Spark](https://youtu.be/oXkxXDG0gNk) from Spark Summit East 2016 in which
+
+Reynold Xin presents the concept of Streaming DataFrames to the public.
+
+\(video\) [Structuring Spark: DataFrames, Datasets, and Streaming](https://youtu.be/i7l3JQRx7Qw?t=19m15s)
+
+[What Spark’s Structured Streaming really means](http://www.infoworld.com/article/3052924/analytics/what-sparks-structured-streaming-really-means.html)
+
+\(video\) [A Deep Dive Into Structured Streaming](https://youtu.be/rl8dIzTpxrI) by Tathagata "TD" Das from Spark
+
+Summit 2016
 
 
 
