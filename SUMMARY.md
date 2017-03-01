@@ -161,4 +161,11 @@
     * [GeneralizedLinearRegression \(GLM\).md\)](spark-mllib/generalizedlinearregression-(glm)
   * Structured Streaming
     * [Structured Streaming — Streaming Datasets](structured-streaming-streaming-datasets.md)
+    * [DataStreamReader](datastreamreader.md)
+    * [DataStreamWriter](datastreamwriter.md)
+    * [Streaming Sources](streaming-sources.md)
+      * [FileStreamSource](streaming-sources/filestreamsource.md)
+      * KafkaSource
+      * [TextSocketSource](streaming-sources/textsocketsource.md)
+    * [Streaming Sinks](streaming-sinks.md)
 

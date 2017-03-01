@@ -8,7 +8,7 @@
 
 结构化流是尝试统一流，交互式和批处理查询，为连续应用（如使用groupBy运算符的连续聚合或使用具有窗口函数的groupBy运算符的连续窗口聚合）​​铺平道路。
 
-```
+```scala
 // business object
 case class Person(id: Long, name: String, city: String)
 // you could build your schema manually
